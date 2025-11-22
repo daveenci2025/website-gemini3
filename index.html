@@ -26,9 +26,9 @@
                 muted: '#5A4A3A',   // Soft warm brown
               },
               accent: {
-                DEFAULT: '#00ADB5', // Electric Teal
-                light: '#4DD0E1',
-                hover: '#00798C',
+                DEFAULT: '#3f84c8', // Updated Blue
+                light: '#64a1e0',
+                hover: '#2f6ca8',
               }
             },
             fontFamily: {
@@ -37,6 +37,17 @@
             },
             backgroundImage: {
               'paper-texture': "url('https://www.transparenttextures.com/patterns/cream-paper.png')", // Subtle texture fallback or remove if prefer solid
+            },
+            animation: {
+              'float': 'float 6s ease-in-out infinite',
+              'float-delayed': 'float 6s ease-in-out 3s infinite',
+              'spin-slow': 'spin 12s linear infinite',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-10px)' },
+              }
             }
           }
         }
@@ -54,7 +65,7 @@
       }
       /* Custom Selection Color */
       ::selection {
-        background-color: #00ADB5;
+        background-color: #3f84c8;
         color: #ffffff;
       }
     </style>
