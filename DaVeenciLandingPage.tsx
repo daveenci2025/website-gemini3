@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowRight, ChevronRight, ChevronLeft, ArrowUpRight, Mail, Cpu, Activity, GitGraph, Zap, Settings, Calendar as CalendarIcon, Clock, Check } from 'lucide-react';
+import { Menu, X, ArrowRight, ChevronRight, ChevronLeft, ArrowUpRight, Mail, Cpu, Activity, GitGraph, Zap, Settings, Calendar as CalendarIcon, Clock, Check, Globe, Share2, Users, Database, MessageSquare, Facebook, Instagram, Linkedin, Twitter } from 'lucide-react';
 
 // --- Types & Interfaces ---
 
@@ -20,6 +21,13 @@ interface SectionProps {
   className?: string;
   children: React.ReactNode;
   pattern?: 'none' | 'grid' | 'circles' | 'nodes';
+}
+
+interface EventCardProps {
+  image: string;
+  date: string;
+  title: string;
+  description: string;
 }
 
 // --- Reusable Visual Components (Da Vinci / AI Motifs) ---
@@ -92,7 +100,7 @@ const Logo: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
-// --- New System Architecture Visuals ---
+// --- System Architecture Visuals ---
 
 const HeroDiagram: React.FC = () => (
   <div className="relative w-full max-w-md lg:max-w-lg mx-auto aspect-square bg-white shadow-2xl shadow-ink/20 rounded-sm border border-ink/10 p-6 md:p-10 rotate-[-2deg] hover:rotate-0 transition-transform duration-700 ease-out">
@@ -109,57 +117,130 @@ const HeroDiagram: React.FC = () => (
     <div className="relative h-full w-full">
         <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 300 250" fill="none">
            
-           {/* Paths - Thinner lines (1.5) for elegance */}
-           {/* Path 1: Input to Top Branch */}
+           {/* Paths */}
            <path d="M 30 125 C 60 125, 100 50, 150 50 C 200 50, 220 30, 240 30" stroke="#C4B59D" strokeWidth="1.5" fill="none" />
-           
-           {/* Path 2: Input to Bottom Branch */}
            <path d="M 30 125 C 60 125, 100 200, 150 200 C 200 200, 240 230, 270 230" stroke="#C4B59D" strokeWidth="1.5" fill="none" />
-           
-           {/* Main Path: Input to Output (Blue Active) */}
            <path d="M 30 125 L 270 125" stroke="#3f84c8" strokeWidth="1.5" className="animate-pulse" />
 
-           {/* Dashed Vertical Line */}
            <line x1="150" y1="50" x2="150" y2="200" stroke="#C4B59D" strokeWidth="1.5" strokeDasharray="4 4" />
 
-           {/* Input Node */}
            <circle cx="30" cy="125" r="6" fill="#222" />
            <text x="30" y="155" textAnchor="middle" fontSize="10" fill="#5A4A3A" fontFamily="monospace" letterSpacing="0.05em">INPUT</text>
 
-           {/* Processing Node (Center) */}
-           {/* Halo */}
            <circle cx="150" cy="125" r="30" fill="#3f84c8" fillOpacity="0.1" stroke="#3f84c8" strokeWidth="1" className="animate-spin-slow origin-[150px_125px]" strokeDasharray="4 2" />
-           {/* Inner solid */}
            <circle cx="150" cy="125" r="4" fill="#3f84c8" />
            <text x="150" y="175" textAnchor="middle" fontSize="10" fontWeight="500" fill="#3f84c8" fontFamily="monospace" letterSpacing="0.05em">PROCESSING</text>
 
-           {/* Top Node */}
            <circle cx="150" cy="50" r="5" fill="white" stroke="#222" strokeWidth="1.5" />
-
-           {/* Bottom Node */}
            <circle cx="150" cy="200" r="5" fill="white" stroke="#222" strokeWidth="1.5" />
 
-           {/* Output Node Main */}
            <rect x="260" y="115" width="20" height="20" rx="2" fill="#3f84c8" />
            <text x="270" y="160" textAnchor="middle" fontSize="10" fill="#5A4A3A" fontFamily="monospace" letterSpacing="0.05em">OUTPUT</text>
-
-           {/* Output Node Bottom */}
            <rect x="265" y="220" width="16" height="16" rx="2" fill="#222" />
         </svg>
 
-        {/* Floating Cards Overlay - Lighter font weights */}
-        {/* Efficiency Card */}
         <div className="absolute top-4 right-0 bg-base shadow-lg border border-ink/10 px-4 py-2 rounded flex items-center gap-3 animate-float">
            <Activity className="w-4 h-4 text-ink-muted" />
            <span className="text-xs font-medium text-ink">Efficiency +40%</span>
         </div>
 
-        {/* Automated Card */}
         <div className="absolute bottom-12 left-8 bg-base shadow-lg border border-ink/10 px-4 py-2 rounded flex items-center gap-3 animate-float-delayed">
            <Cpu className="w-4 h-4 text-accent" />
            <span className="text-xs font-medium text-ink">Automated</span>
         </div>
+    </div>
+  </div>
+);
 
+// --- New CRM Diagram ---
+
+const CRMFlowDiagram: React.FC = () => (
+  <div className="relative w-full max-w-md mx-auto aspect-[4/3] bg-white shadow-xl shadow-ink/10 rounded-sm border border-ink/10 p-8 rotate-[1deg] hover:rotate-0 transition-transform duration-500 ease-out">
+    <div className="flex justify-between items-center mb-6 border-b border-ink/10 pb-4">
+       <div className="font-serif text-lg text-ink italic">Pipeline Automation</div>
+       <div className="font-mono text-[9px] tracking-widest text-ink/30 uppercase">V 1.4</div>
+    </div>
+    <div className="relative h-full w-full">
+      <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 300 180" fill="none">
+         {/* Main Flow Line */}
+         <path d="M 20 90 C 80 90, 100 90, 140 90 C 180 90, 200 90, 260 90" stroke="#C4B59D" strokeWidth="1.5" strokeDasharray="6 4" />
+         <path d="M 20 90 C 80 90, 100 90, 140 90" stroke="#3f84c8" strokeWidth="2" className="animate-pulse" />
+         
+         {/* Lead Source Node (Left) */}
+         <circle cx="30" cy="90" r="18" fill="white" stroke="#222" strokeWidth="1.5" />
+         <circle cx="30" cy="90" r="6" fill="#222" />
+         <text x="30" y="130" textAnchor="middle" fontSize="10" fill="#5A4A3A" fontFamily="monospace">LEADS</text>
+
+         {/* Enrichment Node (Center) */}
+         <path d="M 140 70 L 157 80 L 157 100 L 140 110 L 123 100 L 123 80 Z" fill="white" stroke="#3f84c8" strokeWidth="1.5" />
+         <circle cx="140" cy="90" r="8" fill="#3f84c8" fillOpacity="0.2" className="animate-ping" style={{animationDuration: '3s'}} />
+         <text x="140" y="130" textAnchor="middle" fontSize="10" fill="#3f84c8" fontFamily="monospace">ENRICH</text>
+
+         {/* CRM Destination (Right) */}
+         <rect x="250" y="70" width="30" height="40" rx="2" fill="#222" />
+         <line x1="255" y1="80" x2="275" y2="80" stroke="white" strokeWidth="1" opacity="0.5" />
+         <line x1="255" y1="90" x2="275" y2="90" stroke="white" strokeWidth="1" opacity="0.5" />
+         <text x="265" y="130" textAnchor="middle" fontSize="10" fill="#5A4A3A" fontFamily="monospace">CRM</text>
+
+         {/* Connecting Arc to Slack */}
+         <path d="M 157 80 C 180 40, 220 40, 240 50" stroke="#C4B59D" strokeWidth="1" strokeDasharray="2 2" />
+         <rect x="240" y="35" width="24" height="24" rx="4" fill="white" stroke="#222" strokeWidth="1" />
+         <path d="M 252 47 L 252 47" stroke="#222" strokeWidth="4" strokeLinecap="round" />
+      </svg>
+
+      {/* Floating Badge */}
+      <div className="absolute top-0 right-10 bg-[#f0fdf4] border border-green-100 shadow-sm px-3 py-1 rounded-sm flex items-center gap-2 animate-float">
+         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+         <span className="text-[10px] font-bold text-green-800 tracking-wide">QUALIFIED</span>
+      </div>
+    </div>
+  </div>
+);
+
+// --- New Marketing Engine Diagram ---
+
+const MarketingEngineDiagram: React.FC = () => (
+  <div className="relative w-full max-w-md mx-auto aspect-[4/3] bg-white shadow-xl shadow-ink/10 rounded-sm border border-ink/10 p-8 rotate-[-1deg] hover:rotate-0 transition-transform duration-500 ease-out">
+     <div className="flex justify-between items-center mb-2 border-b border-ink/10 pb-4">
+       <div className="font-serif text-lg text-ink italic">Content Multiplier</div>
+       <div className="font-mono text-[9px] tracking-widest text-ink/30 uppercase">ENG 2.0</div>
+    </div>
+    <div className="relative h-full w-full">
+       <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 300 180" fill="none">
+          {/* Center Hub */}
+          <circle cx="150" cy="90" r="24" fill="#white" stroke="#222" strokeWidth="1.5" />
+          <polygon points="145,80 160,90 145,100" fill="#222" />
+          
+          {/* Radiating Lines */}
+          <line x1="174" y1="90" x2="240" y2="50" stroke="#C4B59D" strokeWidth="1.5" />
+          <line x1="174" y1="90" x2="240" y2="130" stroke="#C4B59D" strokeWidth="1.5" />
+          <line x1="126" y1="90" x2="60" y2="90" stroke="#C4B59D" strokeWidth="1.5" />
+
+          {/* Pulse Effects */}
+          <circle cx="150" cy="90" r="30" stroke="#3f84c8" strokeWidth="1" className="animate-ping" style={{animationDuration: '2s', opacity: 0.2}} />
+
+          {/* Nodes */}
+          {/* Blog - Right Top */}
+          <rect x="230" y="30" width="30" height="40" rx="2" fill="white" stroke="#3f84c8" strokeWidth="1.5" />
+          <line x1="238" y1="45" x2="252" y2="45" stroke="#3f84c8" strokeWidth="1" />
+          <line x1="238" y1="55" x2="252" y2="55" stroke="#3f84c8" strokeWidth="1" />
+
+          {/* Social - Right Bottom */}
+          <circle cx="245" cy="130" r="15" fill="white" stroke="#3f84c8" strokeWidth="1.5" />
+          <path d="M 238 132 L 244 138 L 254 124" stroke="#3f84c8" strokeWidth="1.5" fill="none" />
+
+          {/* Newsletter - Left */}
+          <rect x="30" y="75" width="30" height="30" rx="2" fill="#222" />
+          <path d="M 35 85 L 45 92 L 55 85" stroke="white" strokeWidth="1.5" fill="none" />
+          
+          {/* Labels */}
+          <text x="150" y="135" textAnchor="middle" fontSize="10" fill="#222" fontFamily="monospace" letterSpacing="0.1em">SOURCE</text>
+          <text x="245" y="85" textAnchor="middle" fontSize="9" fill="#3f84c8" fontFamily="monospace">REPURPOSED</text>
+       </svg>
+
+       <div className="absolute top-4 left-4 bg-base shadow-sm border border-ink/10 px-3 py-1 rounded-sm animate-float-delayed">
+          <span className="text-[10px] font-bold text-ink-muted tracking-wide uppercase">4x Reach</span>
+       </div>
     </div>
   </div>
 );
@@ -171,6 +252,33 @@ const SchematicDecor: React.FC<{ className?: string }> = ({ className }) => (
         <circle cx="10" cy="30" r="2" fill="#222" />
         <path d="M10 30 C 10 15, 15 10, 30 10" stroke="#222" strokeWidth="1" />
      </svg>
+  </div>
+);
+
+const EventCard: React.FC<EventCardProps> = ({ image, date, title, description }) => (
+  <div className="bg-white border border-ink/10 rounded-sm overflow-hidden flex flex-col hover:shadow-xl transition-all duration-300 group h-full">
+    <div className="h-48 overflow-hidden relative">
+      <img src={image} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+      {/* Subtle overlay */}
+      <div className="absolute inset-0 bg-ink/10 group-hover:bg-transparent transition-colors duration-300"></div>
+    </div>
+    <div className="p-6 md:p-8 flex flex-col flex-grow">
+      <div className="flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-wider mb-3">
+        <CalendarIcon className="w-4 h-4" />
+        <span>{date}</span>
+      </div>
+      <h3 className="font-serif text-xl md:text-2xl text-ink mb-4 leading-tight group-hover:text-accent transition-colors duration-300">{title}</h3>
+      <p className="text-ink-muted text-sm leading-relaxed mb-8 flex-grow">
+        {description}
+      </p>
+      
+      <div className="flex items-center gap-2 text-ink-muted/60 text-xs font-medium mb-6 border-t border-ink/5 pt-4">
+         <Globe className="w-3 h-3" />
+         <span>Online Webinar • 60 min</span>
+      </div>
+
+      <Button variant="primary" className="w-full justify-center">Join Webinar</Button>
+    </div>
   </div>
 );
 
@@ -453,7 +561,7 @@ const DaVeenciLandingPage: React.FC = () => {
   const navLinks: NavLink[] = [
     { label: "Where Teams Get Stuck", href: "#problems" },
     { label: "What We Automate", href: "#automation" },
-    { label: "Services", href: "#services" },
+    { label: "Events", href: "#events" },
     { label: "About", href: "#about" },
     { label: "Newsletter", href: "#newsletter" },
   ];
@@ -470,7 +578,7 @@ const DaVeenciLandingPage: React.FC = () => {
     <div className="flex flex-col w-full overflow-x-hidden">
       
       {/* 0. Header */}
-      <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-base/95 backdrop-blur-md shadow-sm py-3 border-b border-ink/5' : 'bg-transparent py-6'}`}>
+      <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#faf8f2]/95 backdrop-blur-md shadow-sm py-3 border-b border-ink/5' : 'bg-transparent py-6'}`}>
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo & Motto */}
           <div className="flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo(0,0)}>
@@ -578,98 +686,119 @@ const DaVeenciLandingPage: React.FC = () => {
           title="What We Automate"
           subtitle="We don't just 'consult'. We map, build, and deploy."
         />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="space-y-6">
-            <div className="group flex gap-6 p-6 border border-ink/5 bg-white/60 hover:border-accent/30 transition-all rounded-sm">
-               <div className="mt-1"><GitGraph className="w-6 h-6 text-accent" /></div>
-               <div>
-                 <h4 className="font-serif text-xl text-ink mb-2">Sales & Pipeline Ops</h4>
-                 <p className="text-ink-muted text-sm">Automated lead enrichment, personalized outreach generation, and CRM hygiene. Turn SDR work into an automated flow.</p>
-               </div>
-            </div>
-            <div className="group flex gap-6 p-6 border border-ink/5 bg-white/60 hover:border-accent/30 transition-all rounded-sm">
-               <div className="mt-1"><Zap className="w-6 h-6 text-accent" /></div>
-               <div>
-                 <h4 className="font-serif text-xl text-ink mb-2">Customer Success</h4>
-                 <p className="text-ink-muted text-sm">Ticket triage, auto-drafting responses for Tier 1 support, and customer sentiment analysis reports delivered to Slack.</p>
-               </div>
-            </div>
-            <div className="group flex gap-6 p-6 border border-ink/5 bg-white/60 hover:border-accent/30 transition-all rounded-sm">
-               <div className="mt-1"><Settings className="w-6 h-6 text-accent" /></div>
-               <div>
-                 <h4 className="font-serif text-xl text-ink mb-2">Content & Marketing Engine</h4>
-                 <p className="text-ink-muted text-sm">Transforming one webinar into blog posts, LinkedIn threads, and newsletter snippets automatically.</p>
-               </div>
-            </div>
-          </div>
-          <div className="relative flex items-center justify-center bg-ink/5 rounded-sm p-12">
-            <div className="text-center">
-              <div className="inline-flex p-4 border-2 border-dashed border-ink/20 rounded-full mb-6">
-                 <Cpu className="w-12 h-12 text-ink-muted" />
+        
+        <div className="space-y-32">
+           
+           {/* Feature 1: CRM */}
+           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+             <div className="lg:col-span-5 space-y-6">
+                <div className="w-12 h-12 bg-accent/10 text-accent flex items-center justify-center rounded-sm mb-4">
+                  <GitGraph className="w-6 h-6" />
+                </div>
+                <h3 className="font-serif text-3xl text-ink">Sales & Pipeline Ops</h3>
+                <p className="text-ink-muted text-lg leading-relaxed">
+                   Stop manually enriching leads or copy-pasting data between tools. We build self-healing pipelines that enrich contacts, draft personalized outreach, and update your CRM automatically.
+                </p>
+                <ul className="space-y-3 mt-4">
+                  <li className="flex items-center gap-3 text-ink text-sm font-medium">
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Automated Lead Enrichment
+                  </li>
+                  <li className="flex items-center gap-3 text-ink text-sm font-medium">
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> CRM Hygiene & Deduplication
+                  </li>
+                  <li className="flex items-center gap-3 text-ink text-sm font-medium">
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Slack Alerts for High-Intent Leads
+                  </li>
+                </ul>
+             </div>
+             <div className="lg:col-span-7 flex justify-center lg:justify-end">
+                <CRMFlowDiagram />
+             </div>
+           </div>
+
+           {/* Feature 2: Marketing */}
+           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+             <div className="lg:col-span-7 flex justify-center lg:justify-start order-2 lg:order-1">
+                <MarketingEngineDiagram />
+             </div>
+             <div className="lg:col-span-5 space-y-6 order-1 lg:order-2">
+                <div className="w-12 h-12 bg-accent/10 text-accent flex items-center justify-center rounded-sm mb-4">
+                  <Settings className="w-6 h-6" />
+                </div>
+                <h3 className="font-serif text-3xl text-ink">Content & Marketing Engine</h3>
+                <p className="text-ink-muted text-lg leading-relaxed">
+                   Turn one seed asset into a month of content. Our workflows take a single video or webinar and automatically generate blog posts, newsletters, and social threads—maintaining your unique voice.
+                </p>
+                <ul className="space-y-3 mt-4">
+                  <li className="flex items-center gap-3 text-ink text-sm font-medium">
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Video to Blog Transformation
+                  </li>
+                  <li className="flex items-center gap-3 text-ink text-sm font-medium">
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Newsletter Auto-Drafting
+                  </li>
+                  <li className="flex items-center gap-3 text-ink text-sm font-medium">
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Social Media Clipping
+                  </li>
+                </ul>
+             </div>
+           </div>
+           
+           {/* Feature 3: Customer Success (Compact) */}
+           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-12 border-t border-ink/10">
+              <div className="col-span-1 lg:col-span-1">
+                 <h4 className="font-serif text-2xl text-ink mb-4">Also Available: Customer Success</h4>
               </div>
-              <h3 className="font-serif text-2xl text-ink mb-2">The DaVeenci Engine</h3>
-              <p className="text-ink-muted max-w-xs mx-auto text-sm">
-                Custom workflows built on n8n, Make, and Python scripts, seamlessly integrated into your existing stack.
-              </p>
-            </div>
-          </div>
+              <div className="col-span-1 lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
+                 <div className="flex gap-4">
+                    <Zap className="w-6 h-6 text-ink-muted mt-1 flex-shrink-0" />
+                    <div>
+                       <h5 className="font-medium text-ink mb-1">Support Triage</h5>
+                       <p className="text-sm text-ink-muted">Auto-labeling and routing tickets based on sentiment and urgency.</p>
+                    </div>
+                 </div>
+                 <div className="flex gap-4">
+                    <MessageSquare className="w-6 h-6 text-ink-muted mt-1 flex-shrink-0" />
+                    <div>
+                       <h5 className="font-medium text-ink mb-1">Draft Responses</h5>
+                       <p className="text-sm text-ink-muted">AI-drafted replies for Tier 1 tickets, ready for human review.</p>
+                    </div>
+                 </div>
+              </div>
+           </div>
+
         </div>
       </Section>
 
-      {/* 4. Services & Pricing */}
-      <Section id="services" pattern="grid" className="bg-ink text-base">
+      {/* 4. Events */}
+      <Section id="events" pattern="grid" className="bg-alt/30">
         <div className="relative z-10">
           <SectionHeader 
             eyebrow="Folio IV — Engagement"
-            title="How We Partner"
-            subtitle="Simple, transparent engagement models. No hourly billing, just outcomes."
-            className="text-base [&_*]:text-base [&_p]:text-base/70 [&_span]:bg-white/10 [&_span]:text-base/90"
+            title="Upcoming Intelligence"
+            subtitle="Join the conversation with industry leaders, founders, and builders."
           />
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-             {/* Card 1 */}
-             <div className="bg-ink-muted/30 border border-white/10 p-8 rounded-sm flex flex-col">
-                <div className="mb-6">
-                  <span className="text-accent font-bold tracking-wider text-xs uppercase">Audit</span>
-                  <h3 className="font-serif text-3xl text-base mt-2">The Blueprint</h3>
-                </div>
-                <ul className="space-y-4 text-base/70 text-sm mb-8 flex-1">
-                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> Workflow Mapping</li>
-                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> Tool Stack Audit</li>
-                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> ROI Calculator</li>
-                </ul>
-                <Button variant="secondary" className="w-full text-base border-white/20 hover:bg-white/10 hover:text-white" onClick={scrollToBooking}>Book Audit</Button>
-             </div>
-
-             {/* Card 2 - Highlighted */}
-             <div className="bg-base text-ink p-8 rounded-sm flex flex-col transform md:-translate-y-4 shadow-xl relative">
-                <div className="absolute top-0 right-0 bg-accent text-white text-xs font-bold px-3 py-1 rounded-bl-sm uppercase tracking-wide">Popular</div>
-                <div className="mb-6">
-                  <span className="text-accent font-bold tracking-wider text-xs uppercase">Build</span>
-                  <h3 className="font-serif text-3xl text-ink mt-2">The Workshop</h3>
-                </div>
-                <ul className="space-y-4 text-ink-muted text-sm mb-8 flex-1">
-                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> 3 Custom Automations</li>
-                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> Team Training Session</li>
-                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> 30 Days of Support</li>
-                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> Prompt Library</li>
-                </ul>
-                <Button variant="primary" className="w-full" onClick={scrollToBooking}>Start Build</Button>
-             </div>
-
-             {/* Card 3 */}
-             <div className="bg-ink-muted/30 border border-white/10 p-8 rounded-sm flex flex-col">
-                <div className="mb-6">
-                  <span className="text-accent font-bold tracking-wider text-xs uppercase">Scale</span>
-                  <h3 className="font-serif text-3xl text-base mt-2">Fractional CAIO</h3>
-                </div>
-                <ul className="space-y-4 text-base/70 text-sm mb-8 flex-1">
-                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> Ongoing Optimization</li>
-                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> Weekly Strategy Calls</li>
-                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> Vendor Management</li>
-                </ul>
-                <Button variant="secondary" className="w-full text-base border-white/20 hover:bg-white/10 hover:text-white" onClick={scrollToBooking}>Contact Us</Button>
-             </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+             <EventCard 
+                image="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=800"
+                date="Fri, Nov 28, 2025 @ 10:00 AM CST"
+                title="AI × Ops: The Networking Session"
+                description="Curious about how AI and automation are transforming work? Meet founders, builders, and operators at this interactive networking event."
+             />
+             
+             <EventCard 
+                image="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800"
+                date="Fri, Dec 12, 2025 @ 10:30 AM CST"
+                title="The Battle Between AEO and SEO"
+                description="In this session, we explore the shifting terrain between classic SEO—the old mapmakers of the web—and AEO, the new intelligence engines."
+             />
+             
+             <EventCard 
+                image="https://images.unsplash.com/photo-1558494949-efc02570fbc2?auto=format&fit=crop&q=80&w=800"
+                date="Fri, Jan 9, 2026 @ 10:00 AM CST"
+                title="AI Foundations: Own Your Stack – Hosting & Servers"
+                description="Learn how to run AI apps on infrastructure you actually control. We’ll cover the essentials of hosting, servers, and GPU access."
+             />
           </div>
         </div>
       </Section>
@@ -718,10 +847,19 @@ const DaVeenciLandingPage: React.FC = () => {
             <div className="text-sm text-base/50">
                © {new Date().getFullYear()} DaVeenci Consulting. All rights reserved.
             </div>
-            <div className="flex gap-6 text-sm text-base/70">
-               <a href="#" className="hover:text-white transition-colors">Twitter</a>
-               <a href="#" className="hover:text-white transition-colors">LinkedIn</a>
-               <a href="#" className="hover:text-white transition-colors">Email</a>
+            <div className="flex gap-6 items-center">
+               <a href="#" className="text-base/70 hover:text-white transition-colors" aria-label="Facebook">
+                  <Facebook className="w-5 h-5" />
+               </a>
+               <a href="#" className="text-base/70 hover:text-white transition-colors" aria-label="Instagram">
+                  <Instagram className="w-5 h-5" />
+               </a>
+               <a href="#" className="text-base/70 hover:text-white transition-colors" aria-label="LinkedIn">
+                  <Linkedin className="w-5 h-5" />
+               </a>
+               <a href="#" className="text-base/70 hover:text-white transition-colors" aria-label="X">
+                  <Twitter className="w-5 h-5" />
+               </a>
             </div>
          </div>
       </footer>
@@ -731,3 +869,4 @@ const DaVeenciLandingPage: React.FC = () => {
 };
 
 export default DaVeenciLandingPage;
+    
