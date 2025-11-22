@@ -255,29 +255,65 @@ const SchematicDecor: React.FC<{ className?: string }> = ({ className }) => (
   </div>
 );
 
-const EventCard: React.FC<EventCardProps> = ({ image, date, title, description }) => (
-  <div className="bg-white border border-ink/10 rounded-sm overflow-hidden flex flex-col hover:shadow-xl transition-all duration-300 group h-full">
-    <div className="h-48 overflow-hidden relative">
-      <img src={image} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-      {/* Subtle overlay */}
-      <div className="absolute inset-0 bg-ink/10 group-hover:bg-transparent transition-colors duration-300"></div>
-    </div>
-    <div className="p-6 md:p-8 flex flex-col flex-grow">
-      <div className="flex items-center gap-2 text-accent text-xs font-bold uppercase tracking-wider mb-3">
-        <CalendarIcon className="w-4 h-4" />
-        <span>{date}</span>
-      </div>
-      <h3 className="font-serif text-xl md:text-2xl text-ink mb-4 leading-tight group-hover:text-accent transition-colors duration-300">{title}</h3>
-      <p className="text-ink-muted text-sm leading-relaxed mb-8 flex-grow">
-        {description}
-      </p>
+const CodexEventCard: React.FC<EventCardProps & { index: number }> = ({ image, date, title, description, index }) => (
+  <div className="group relative flex flex-col h-full bg-[#FDFBF7] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]">
+    
+    {/* Border imitating a page edge with depth */}
+    <div className="absolute inset-0 border border-[#D6CFC0] shadow-[inset_0_0_20px_rgba(214,207,192,0.2)] pointer-events-none"></div>
+    
+    {/* Decorative Corner Marks */}
+    <div className="absolute top-2 left-2 w-2 h-2 border-t border-l border-ink/20"></div>
+    <div className="absolute top-2 right-2 w-2 h-2 border-t border-r border-ink/20"></div>
+    <div className="absolute bottom-2 left-2 w-2 h-2 border-b border-l border-ink/20"></div>
+    <div className="absolute bottom-2 right-2 w-2 h-2 border-b border-r border-ink/20"></div>
+
+    {/* Content Area */}
+    <div className="relative p-6 md:p-8 flex flex-col h-full z-10">
       
-      <div className="flex items-center gap-2 text-ink-muted/60 text-xs font-medium mb-6 border-t border-ink/5 pt-4">
-         <Globe className="w-3 h-3" />
-         <span>Online Webinar • 60 min</span>
+      {/* Header: Identifier */}
+      <div className="flex justify-between items-end mb-6 border-b border-ink/10 pb-3 border-dashed">
+         <div className="flex flex-col">
+            <span className="font-serif text-[10px] italic text-ink/40 mb-1">Codex Atlanticus</span>
+            <span className="font-mono text-xs font-bold tracking-widest text-ink/60 uppercase">Folio {100 + index}.v2</span>
+         </div>
+         <div className="font-sans text-[10px] font-medium text-accent uppercase tracking-wider px-2 py-1 bg-accent/5 rounded-sm">
+            Upcoming
+         </div>
       </div>
 
-      <Button variant="primary" className="w-full justify-center">Join Webinar</Button>
+      {/* Image Area - Sketch Style */}
+      <div className="relative aspect-[16/10] mb-6 overflow-hidden border border-ink/10 p-1 bg-white shadow-sm rotate-[0.5deg] group-hover:rotate-0 transition-transform duration-500">
+         <div className="relative w-full h-full overflow-hidden bg-ink/5">
+             <img 
+                src={image} 
+                alt={title} 
+                className="w-full h-full object-cover opacity-90 filter sepia-[0.2] grayscale-[0.4] contrast-[1.1] group-hover:filter-none group-hover:opacity-100 transition-all duration-700" 
+             />
+             {/* Overlay grid for technical feel */}
+             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')] opacity-20 mix-blend-multiply pointer-events-none"></div>
+         </div>
+      </div>
+
+      {/* Title & Description */}
+      <div className="mb-4">
+        <h3 className="font-serif text-2xl text-ink mb-3 group-hover:text-accent transition-colors">{title}</h3>
+        <div className="flex items-center gap-2 text-ink-muted/60 text-xs font-serif italic mb-4">
+            <CalendarIcon className="w-3 h-3" />
+            <span>{date}</span>
+        </div>
+        <p className="font-serif text-sm leading-relaxed text-ink/70 italic border-l-2 border-ink/10 pl-4">
+           "{description}"
+        </p>
+      </div>
+
+      {/* Footer / Action */}
+      <div className="mt-auto pt-6 flex items-center justify-between">
+         <span className="font-mono text-[9px] tracking-widest text-ink/30 uppercase">Ref: DA-2025-0{index + 1}</span>
+         <button className="group/btn flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-ink hover:text-accent transition-colors">
+            <span>Register</span>
+            <ArrowRight className="w-3 h-3 transform group-hover/btn:translate-x-1 transition-transform" />
+         </button>
+      </div>
     </div>
   </div>
 );
@@ -779,26 +815,28 @@ const DaVeenciLandingPage: React.FC = () => {
           />
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-             <EventCard 
-                image="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=800"
-                date="Fri, Nov 28, 2025 @ 10:00 AM CST"
-                title="AI × Ops: The Networking Session"
-                description="Curious about how AI and automation are transforming work? Meet founders, builders, and operators at this interactive networking event."
-             />
-             
-             <EventCard 
-                image="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800"
-                date="Fri, Dec 12, 2025 @ 10:30 AM CST"
-                title="The Battle Between AEO and SEO"
-                description="In this session, we explore the shifting terrain between classic SEO—the old mapmakers of the web—and AEO, the new intelligence engines."
-             />
-             
-             <EventCard 
-                image="https://images.unsplash.com/photo-1558494949-efc02570fbc2?auto=format&fit=crop&q=80&w=800"
-                date="Fri, Jan 9, 2026 @ 10:00 AM CST"
-                title="AI Foundations: Own Your Stack – Hosting & Servers"
-                description="Learn how to run AI apps on infrastructure you actually control. We’ll cover the essentials of hosting, servers, and GPU access."
-             />
+             {[
+                {
+                   image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=800",
+                   date: "Fri, Nov 28, 2025 @ 10:00 AM CST",
+                   title: "AI × Ops: The Networking Session",
+                   description: "Curious about how AI and automation are transforming work? Meet founders, builders, and operators at this interactive networking event."
+                },
+                {
+                   image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800",
+                   date: "Fri, Dec 12, 2025 @ 10:30 AM CST",
+                   title: "The Battle Between AEO and SEO",
+                   description: "In this session, we explore the shifting terrain between classic SEO—the old mapmakers of the web—and AEO, the new intelligence engines."
+                },
+                {
+                   image: "https://images.unsplash.com/photo-1558494949-efc02570fbc2?auto=format&fit=crop&q=80&w=800",
+                   date: "Fri, Jan 9, 2026 @ 10:00 AM CST",
+                   title: "AI Foundations: Own Your Stack",
+                   description: "Learn how to run AI apps on infrastructure you actually control. We’ll cover the essentials of hosting, servers, and GPU access."
+                }
+             ].map((event, idx) => (
+                <CodexEventCard key={idx} index={idx} {...event} />
+             ))}
           </div>
         </div>
       </Section>
@@ -839,14 +877,26 @@ const DaVeenciLandingPage: React.FC = () => {
 
       {/* 8. Footer */}
       <footer className="bg-ink text-base py-12 border-t border-white/10">
-         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+            {/* Brand */}
             <div className="flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
                <Logo className="w-6 h-6" />
                <span className="font-serif text-lg font-bold">DaVeenci</span>
             </div>
-            <div className="text-sm text-base/50">
-               © {new Date().getFullYear()} DaVeenci Consulting. All rights reserved.
+            
+            {/* Links & Copyright */}
+            <div className="flex flex-col items-center gap-3">
+               <div className="flex gap-6 text-sm font-medium text-base/70">
+                  <a href="#" className="hover:text-white transition-colors">Terms</a>
+                  <a href="#" className="hover:text-white transition-colors">Conditions</a>
+                  <a href="#" className="hover:text-white transition-colors">Admin Panel</a>
+               </div>
+               <div className="text-xs text-base/40">
+                  © {new Date().getFullYear()} DaVeenci Consulting. All rights reserved.
+               </div>
             </div>
+
+            {/* Socials */}
             <div className="flex gap-6 items-center">
                <a href="#" className="text-base/70 hover:text-white transition-colors" aria-label="Facebook">
                   <Facebook className="w-5 h-5" />
@@ -869,4 +919,3 @@ const DaVeenciLandingPage: React.FC = () => {
 };
 
 export default DaVeenciLandingPage;
-    
