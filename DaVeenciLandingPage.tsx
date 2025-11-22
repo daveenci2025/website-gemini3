@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowRight, ChevronRight, ChevronLeft, ArrowUpRight, Mail, Cpu, Activity, GitGraph, Zap, Settings, Calendar as CalendarIcon, Clock, Check, Globe, Share2, Users, Database, MessageSquare, Facebook, Instagram, Linkedin, Twitter } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Menu, X, ArrowRight, ChevronRight, ChevronLeft, ArrowUpRight, Mail, Cpu, Activity, GitGraph, Zap, Settings, Calendar as CalendarIcon, Clock, Check, Globe, Share2, Users, Database, MessageSquare, Facebook, Instagram, Linkedin, Twitter, Phone, Radio } from 'lucide-react';
 
 // --- Types & Interfaces ---
 
@@ -31,40 +31,175 @@ interface EventCardProps {
   description: string;
 }
 
+// --- Scroll Animation Hook & Component ---
+
+const ScrollReveal: React.FC<{ children: React.ReactNode; className?: string; delay?: number; direction?: 'up' | 'left' | 'right' }> = ({ children, className = "", delay = 0, direction = 'up' }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const getTransform = () => {
+    if (direction === 'up') return 'translate-y-12 scale-95';
+    if (direction === 'left') return '-translate-x-12 scale-95';
+    if (direction === 'right') return 'translate-x-12 scale-95';
+    return 'translate-y-12 scale-95';
+  };
+
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-1000 ease-out transform ${
+        isVisible ? "opacity-100 translate-y-0 translate-x-0 scale-100" : `opacity-0 ${getTransform()}`
+      } ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+};
+
 // --- Reusable Visual Components (Da Vinci / AI Motifs) ---
 
-const VitruvianBackground: React.FC<{ className?: string }> = ({ className }) => (
-  <div className={`absolute inset-0 pointer-events-none overflow-hidden opacity-[0.08] ${className}`}>
-    <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px]" viewBox="0 0 800 800">
-      <circle cx="400" cy="400" r="380" fill="none" stroke="currentColor" strokeWidth="1" />
-      <circle cx="400" cy="400" r="300" fill="none" stroke="currentColor" strokeWidth="0.5" strokeDasharray="4 4" />
-      <rect x="120" y="120" width="560" height="560" fill="none" stroke="currentColor" strokeWidth="1" />
-      <line x1="400" y1="20" x2="400" y2="780" stroke="currentColor" strokeWidth="0.5" />
-      <line x1="20" y1="400" x2="780" y2="400" stroke="currentColor" strokeWidth="0.5" />
-      {/* Angular lines */}
-      <line x1="120" y1="120" x2="680" y2="680" stroke="currentColor" strokeWidth="0.5" opacity="0.5" />
-      <line x1="680" y1="120" x2="120" y2="680" stroke="currentColor" strokeWidth="0.5" opacity="0.5" />
-    </svg>
-  </div>
-);
+const VitruvianBackground: React.FC<{ className?: string }> = ({ className }) => {
+  return (
+    <div className={`absolute inset-0 pointer-events-none overflow-hidden opacity-[0.12] ${className}`}>
+      <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px]" viewBox="0 0 800 800">
+        {/* Continuously Rotating Circles - Sped up for visibility */}
+        <g className="animate-[spin_40s_linear_infinite]" style={{ transformOrigin: '400px 400px' }}>
+           <circle cx="400" cy="400" r="380" fill="none" stroke="currentColor" strokeWidth="1" />
+           <rect x="120" y="120" width="560" height="560" fill="none" stroke="currentColor" strokeWidth="1" />
+        </g>
+        
+        <g className="animate-[spin_50s_linear_infinite_reverse]" style={{ transformOrigin: '400px 400px' }}>
+           <circle cx="400" cy="400" r="300" fill="none" stroke="currentColor" strokeWidth="0.8" strokeDasharray="12 12" />
+        </g>
 
-const NodeNetworkBackground: React.FC<{ className?: string }> = ({ className }) => (
-  <div className={`absolute inset-0 pointer-events-none overflow-hidden opacity-[0.15] ${className}`}>
-    <svg className="absolute w-full h-full text-accent" viewBox="0 0 100 100" preserveAspectRatio="none">
-      {/* Random nodes and edges */}
-      <circle cx="10" cy="20" r="0.5" fill="currentColor" />
-      <circle cx="30" cy="40" r="0.5" fill="currentColor" />
-      <circle cx="80" cy="15" r="0.5" fill="currentColor" />
-      <circle cx="60" cy="70" r="0.5" fill="currentColor" />
-      <circle cx="90" cy="80" r="0.5" fill="currentColor" />
+        {/* Static Geometry */}
+        <line x1="400" y1="20" x2="400" y2="780" stroke="currentColor" strokeWidth="0.5" />
+        <line x1="20" y1="400" x2="780" y2="400" stroke="currentColor" strokeWidth="0.5" />
+        
+        {/* Angular lines */}
+        <line x1="120" y1="120" x2="680" y2="680" stroke="currentColor" strokeWidth="0.5" opacity="0.5" />
+        <line x1="680" y1="120" x2="120" y2="680" stroke="currentColor" strokeWidth="0.5" opacity="0.5" />
+      </svg>
+    </div>
+  );
+};
+
+const NodeNetworkBackground: React.FC<{ className?: string }> = ({ className }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    let particles: { x: number; y: number; vx: number; vy: number }[] = [];
+    const connectionDistance = 200;
+
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      ctx.scale(dpr, dpr);
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      initParticles();
+    };
+
+    const initParticles = () => {
+      particles = [];
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      // Moderate density
+      const particleCount = Math.floor((width * height) / 50000); 
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          // Slower velocity for subtle background effect
+          vx: (Math.random() - 0.5) * 0.4, 
+          vy: (Math.random() - 0.5) * 0.4,
+        });
+      }
+    };
+
+    const animate = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
       
-      <line x1="10" y1="20" x2="30" y2="40" stroke="currentColor" strokeWidth="0.1" />
-      <line x1="30" y1="40" x2="60" y2="70" stroke="currentColor" strokeWidth="0.1" />
-      <line x1="80" y1="15" x2="30" y2="40" stroke="currentColor" strokeWidth="0.1" />
-      <line x1="60" y1="70" x2="90" y2="80" stroke="currentColor" strokeWidth="0.1" />
-    </svg>
-  </div>
-);
+      ctx.clearRect(0, 0, width, height);
+      
+      // Update and draw particles
+      particles.forEach((p, i) => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Bounce off edges
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        // Draw Node - Small, subtle, ink color
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#222222'; 
+        ctx.fill();
+
+        // Draw Connections - Thin, subtle, ink color
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < connectionDistance) {
+            ctx.beginPath();
+            // Matching ink color with variable opacity
+            ctx.strokeStyle = `rgba(34, 34, 34, ${(1 - distance / connectionDistance) * 0.5})`; 
+            ctx.lineWidth = 0.8;
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
+      });
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    window.addEventListener('resize', resize);
+    resize();
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return (
+    // Opacity matched to Vitruvian background (0.12 - 0.15 range)
+    <div className={`absolute inset-0 pointer-events-none overflow-hidden opacity-[0.15] ${className}`}>
+      <canvas ref={canvasRef} className="w-full h-full block" />
+    </div>
+  );
+};
 
 const GridPattern: React.FC<{ className?: string }> = ({ className }) => (
   <div className={`absolute inset-0 pointer-events-none opacity-[0.05] ${className}`} 
@@ -85,26 +220,19 @@ const Logo: React.FC<{ className?: string }> = ({ className }) => (
     strokeLinecap="round" 
     strokeLinejoin="round"
   >
-    {/* Geometric Cube/Hexagon Projection - Elegant & Structural */}
     <path d="M12 2.5L20.5 7.2V16.8L12 21.5L3.5 16.8V7.2L12 2.5Z" strokeWidth="1.5" />
-    
-    {/* Internal Geometry */}
     <path d="M12 12V2.5" strokeWidth="0.8" className="opacity-60" />
     <path d="M12 12L20.5 16.8" strokeWidth="0.8" className="opacity-60" />
     <path d="M12 12L3.5 16.8" strokeWidth="0.8" className="opacity-60" />
-    
-    {/* The Node (The AI Core) */}
     <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none" />
-    
-    {/* Orbital Ring (optional elegance) */}
-    <circle cx="12" cy="12" r="8" strokeWidth="0.5" strokeDasharray="3 3" className="opacity-40" />
+    <circle cx="12" cy="12" r="8" strokeWidth="0.5" strokeDasharray="3 3" className="opacity-40 animate-spin-slow origin-center" style={{transformOrigin: '12px 12px'}} />
   </svg>
 );
 
 // --- System Architecture Visuals ---
 
 const HeroDiagram: React.FC = () => (
-  <div className="relative w-full max-w-md lg:max-w-lg mx-auto aspect-square bg-white shadow-2xl shadow-ink/20 rounded-sm border border-ink/10 p-6 md:p-10 rotate-[-2deg] hover:rotate-0 transition-transform duration-700 ease-out">
+  <div className="relative w-full max-w-md lg:max-w-lg mx-auto aspect-square bg-white shadow-2xl shadow-ink/20 rounded-sm border border-ink/10 p-6 md:p-10 rotate-[-2deg] hover:rotate-0 transition-transform duration-700 ease-out group">
     {/* Card Header */}
     <div className="flex justify-between items-center mb-8 border-b border-ink/10 pb-4">
        <div className="flex gap-2">
@@ -156,7 +284,7 @@ const HeroDiagram: React.FC = () => (
 // --- New CRM Diagram ---
 
 const CRMFlowDiagram: React.FC = () => (
-  <div className="relative w-full max-w-md mx-auto aspect-[4/3] bg-white shadow-xl shadow-ink/10 rounded-sm border border-ink/10 p-8 rotate-[1deg] hover:rotate-0 transition-transform duration-500 ease-out">
+  <div className="relative w-full max-w-lg lg:max-w-xl mx-auto aspect-[4/3] bg-white shadow-xl shadow-ink/10 rounded-sm border border-ink/10 p-8 rotate-[1deg] hover:rotate-0 transition-transform duration-500 ease-out">
     <div className="flex justify-between items-center mb-6 border-b border-ink/10 pb-4">
        <div className="font-serif text-lg text-ink italic">Pipeline Automation</div>
        <div className="font-mono text-[9px] tracking-widest text-ink/30 uppercase">V 1.4</div>
@@ -201,7 +329,7 @@ const CRMFlowDiagram: React.FC = () => (
 // --- New Marketing Engine Diagram ---
 
 const MarketingEngineDiagram: React.FC = () => (
-  <div className="relative w-full max-w-md mx-auto aspect-[4/3] bg-white shadow-xl shadow-ink/10 rounded-sm border border-ink/10 p-8 rotate-[-1deg] hover:rotate-0 transition-transform duration-500 ease-out">
+  <div className="relative w-full max-w-lg lg:max-w-xl mx-auto aspect-[4/3] bg-white shadow-xl shadow-ink/10 rounded-sm border border-ink/10 p-8 rotate-[-1deg] hover:rotate-0 transition-transform duration-500 ease-out">
      <div className="flex justify-between items-center mb-2 border-b border-ink/10 pb-4">
        <div className="font-serif text-lg text-ink italic">Content Multiplier</div>
        <div className="font-mono text-[9px] tracking-widest text-ink/30 uppercase">ENG 2.0</div>
@@ -246,6 +374,64 @@ const MarketingEngineDiagram: React.FC = () => (
   </div>
 );
 
+// --- New Ops Diagram ---
+
+const OpsDiagram: React.FC = () => (
+  <div className="relative w-full max-w-lg lg:max-w-xl mx-auto aspect-square bg-white shadow-xl shadow-ink/10 rounded-sm border border-ink/10 p-8 rotate-[1deg] hover:rotate-0 transition-transform duration-500 ease-out">
+    <div className="flex justify-between items-center mb-6 border-b border-ink/10 pb-4">
+       <div className="font-serif text-lg text-ink italic">Central Command</div>
+       <div className="font-mono text-[9px] tracking-widest text-ink/30 uppercase">OPS 3.0</div>
+    </div>
+    <div className="relative h-full w-full">
+      <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 300 250" fill="none">
+         {/* Center Node (AI Dispatch) */}
+         <circle cx="150" cy="125" r="25" fill="#222" />
+         <circle cx="150" cy="125" r="35" stroke="#222" strokeWidth="1" strokeDasharray="2 4" className="animate-spin-slow" />
+         <text x="150" y="129" textAnchor="middle" fontSize="8" fill="white" fontFamily="monospace" fontWeight="bold">AI CORE</text>
+
+         {/* Inputs (Left) */}
+         <g transform="translate(20, 80)">
+             <rect x="0" y="0" width="40" height="20" rx="4" fill="white" stroke="#ink" strokeWidth="1"/>
+             <text x="20" y="13" textAnchor="middle" fontSize="8" fill="#555">CALL</text>
+             <line x1="42" y1="10" x2="100" y2="40" stroke="#C4B59D" strokeWidth="1.5" strokeDasharray="3 3" />
+         </g>
+         <g transform="translate(20, 150)">
+             <rect x="0" y="0" width="40" height="20" rx="4" fill="white" stroke="#ink" strokeWidth="1"/>
+             <text x="20" y="13" textAnchor="middle" fontSize="8" fill="#555">EMAIL</text>
+             <line x1="42" y1="10" x2="100" y2="-20" stroke="#C4B59D" strokeWidth="1.5" strokeDasharray="3 3" />
+         </g>
+
+         {/* Routing Lines */}
+         <path d="M 175 125 L 240 80" stroke="#3f84c8" strokeWidth="1.5" />
+         <path d="M 175 125 L 240 125" stroke="#3f84c8" strokeWidth="1.5" />
+         <path d="M 175 125 L 240 170" stroke="#3f84c8" strokeWidth="1.5" />
+
+         {/* Outputs (Right) */}
+         {/* 1. Schedule */}
+         <circle cx="250" cy="80" r="15" fill="white" stroke="#3f84c8" strokeWidth="1.5" />
+         <path d="M 245 75 L 255 85" stroke="#3f84c8" strokeWidth="1.5" />
+         <path d="M 255 75 L 245 85" stroke="#3f84c8" strokeWidth="1.5" />
+         <text x="280" y="83" fontSize="8" fill="#3f84c8">CALENDAR</text>
+
+         {/* 2. Dispatch */}
+         <circle cx="250" cy="125" r="15" fill="white" stroke="#3f84c8" strokeWidth="1.5" />
+         <rect x="242" y="117" width="16" height="16" stroke="#3f84c8" strokeWidth="1"/>
+         <text x="280" y="128" fontSize="8" fill="#3f84c8">DISPATCH</text>
+
+         {/* 3. Database */}
+         <circle cx="250" cy="170" r="15" fill="white" stroke="#3f84c8" strokeWidth="1.5" />
+         <path d="M 242 165 h 16 v 10 h -16 z" stroke="#3f84c8" strokeWidth="1" fill="none"/>
+         <text x="280" y="173" fontSize="8" fill="#3f84c8">RECORD</text>
+      </svg>
+      
+      {/* Floating Status */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-ink text-white px-3 py-1 rounded-full text-[10px] font-mono tracking-widest shadow-lg animate-float">
+         ROUTING ACTIVE
+      </div>
+    </div>
+  </div>
+);
+
 const SchematicDecor: React.FC<{ className?: string }> = ({ className }) => (
   <div className={`absolute right-4 top-4 opacity-30 ${className}`}>
      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
@@ -257,25 +443,25 @@ const SchematicDecor: React.FC<{ className?: string }> = ({ className }) => (
 );
 
 const CodexEventCard: React.FC<EventCardProps & { index: number }> = ({ image, date, title, description, index }) => (
-  <div className="group relative flex flex-col h-full bg-[#FDFBF7] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]">
+  <div className="group relative flex flex-col h-full min-h-[640px] bg-[#FDFBF7] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)]">
     
     {/* Border imitating a page edge with depth */}
     <div className="absolute inset-0 border border-[#D6CFC0] shadow-[inset_0_0_20px_rgba(214,207,192,0.2)] pointer-events-none"></div>
     
     {/* Decorative Corner Marks */}
-    <div className="absolute top-2 left-2 w-2 h-2 border-t border-l border-ink/20"></div>
-    <div className="absolute top-2 right-2 w-2 h-2 border-t border-r border-ink/20"></div>
-    <div className="absolute bottom-2 left-2 w-2 h-2 border-b border-l border-ink/20"></div>
-    <div className="absolute bottom-2 right-2 w-2 h-2 border-b border-r border-ink/20"></div>
+    <div className="absolute top-3 left-3 w-3 h-3 border-t border-l border-ink/20"></div>
+    <div className="absolute top-3 right-3 w-3 h-3 border-t border-r border-ink/20"></div>
+    <div className="absolute bottom-3 left-3 w-3 h-3 border-b border-l border-ink/20"></div>
+    <div className="absolute bottom-3 right-3 w-3 h-3 border-b border-r border-ink/20"></div>
 
     {/* Content Area */}
-    <div className="relative p-6 md:p-8 flex flex-col h-full z-10">
+    <div className="relative p-10 flex flex-col h-full z-10">
       
       {/* Header: Identifier */}
-      <div className="flex justify-between items-end mb-6 border-b border-ink/10 pb-3 border-dashed">
+      <div className="flex justify-between items-end mb-8 border-b border-ink/10 pb-4 border-dashed">
          <div className="flex flex-col">
-            <span className="font-serif text-[10px] italic text-ink/40 mb-1">Codex DaVeenci</span>
-            <span className="font-script text-xl text-ink/60 -rotate-1 transform origin-left">Folio {100 + index}.v2</span>
+            <span className="font-serif text-[11px] italic text-ink/40 mb-1">Codex DaVeenci</span>
+            <span className="font-script text-2xl text-ink/60 -rotate-1 transform origin-left">Folio {100 + index}.v2</span>
          </div>
          <div className="font-sans text-[10px] font-medium text-accent uppercase tracking-wider px-2 py-1 bg-accent/5 rounded-sm">
             Upcoming
@@ -283,7 +469,7 @@ const CodexEventCard: React.FC<EventCardProps & { index: number }> = ({ image, d
       </div>
 
       {/* Image Area - Sketch Style */}
-      <div className="relative aspect-[16/10] mb-6 overflow-hidden border border-ink/10 p-1 bg-white shadow-sm rotate-[0.5deg] group-hover:rotate-0 transition-transform duration-500">
+      <div className="relative aspect-[4/3] mb-8 overflow-hidden border border-ink/10 p-1 bg-white shadow-sm rotate-[0.5deg] group-hover:rotate-0 transition-transform duration-500">
          <div className="relative w-full h-full overflow-hidden bg-ink/5">
              <img 
                 src={image} 
@@ -296,19 +482,19 @@ const CodexEventCard: React.FC<EventCardProps & { index: number }> = ({ image, d
       </div>
 
       {/* Title & Description */}
-      <div className="mb-4">
-        <h3 className="font-serif text-2xl text-ink mb-3 group-hover:text-accent transition-colors">{title}</h3>
-        <div className="flex items-center gap-2 text-ink-muted/60 text-xs font-serif italic mb-4">
-            <CalendarIcon className="w-3 h-3" />
+      <div className="mb-6 flex-grow">
+        <h3 className="font-serif text-4xl text-ink mb-4 group-hover:text-accent transition-colors">{title}</h3>
+        <div className="flex items-center gap-2 text-ink-muted/60 text-sm font-serif italic mb-6">
+            <CalendarIcon className="w-4 h-4" />
             <span>{date}</span>
         </div>
-        <p className="font-serif text-sm leading-relaxed text-ink/70 italic border-l-2 border-ink/10 pl-4">
+        <p className="font-serif text-lg leading-relaxed text-ink/70 italic border-l-2 border-ink/10 pl-6">
            "{description}"
         </p>
       </div>
 
       {/* Footer / Action */}
-      <div className="mt-auto pt-6 flex items-center justify-between">
+      <div className="mt-auto pt-6 flex items-center justify-between border-t border-ink/5">
          <span className="font-mono text-[9px] tracking-widest text-ink/30 uppercase">Ref: DA-2025-0{index + 1}</span>
          <button className="group/btn flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-ink hover:text-accent transition-colors">
             <span>Register</span>
@@ -404,7 +590,7 @@ const Button: React.FC<{
 };
 
 const SectionHeader: React.FC<{ eyebrow: string; title: string; subtitle?: string; className?: string }> = ({ eyebrow, title, subtitle, className }) => (
-  <div className={`mb-12 md:mb-16 ${className}`}>
+  <ScrollReveal className={`mb-12 md:mb-16 ${className}`}>
     <span className="block font-script text-2xl text-ink-muted/80 mb-2 transform -rotate-1 origin-bottom-left">
       {eyebrow}
     </span>
@@ -416,7 +602,7 @@ const SectionHeader: React.FC<{ eyebrow: string; title: string; subtitle?: strin
         {subtitle}
       </p>
     )}
-  </div>
+  </ScrollReveal>
 );
 
 const Card: React.FC<CardProps> = ({ title, children, label, className = '' }) => (
@@ -512,132 +698,136 @@ const BookingSection: React.FC = () => {
   return (
     <Section id="booking" className="bg-alt/20 border-t border-ink/5" overflow={true}>
        <div className="mb-12 text-center">
-          <h2 className="font-serif text-4xl md:text-5xl text-ink mb-4">Select Date & Time</h2>
-          <p className="text-ink-muted">Secure your spot for a Fit Check.</p>
+          <ScrollReveal>
+            <h2 className="font-serif text-4xl md:text-5xl text-ink mb-4">Select Date & Time</h2>
+            <p className="text-ink-muted">Secure your spot for a Fit Check.</p>
+          </ScrollReveal>
        </div>
 
        {/* Wider container: max-w-5xl for a better aspect ratio */}
-       <div className="max-w-5xl mx-auto bg-base shadow-[0_20px_50px_-10px_rgba(0,0,0,0.1)] hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.15)] border border-ink/10 rounded-sm overflow-hidden flex flex-col md:flex-row min-h-[480px] transition-shadow duration-500">
-          {/* Left Panel: Service Details */}
-          <div className="w-full md:w-5/12 p-8 md:p-10 border-r border-ink/10 bg-base relative flex flex-col justify-between z-10">
-             <div>
-                <div className="w-12 h-12 bg-ink text-base flex items-center justify-center rounded-sm mb-8 shadow-md">
-                   <CalendarIcon className="w-6 h-6" />
-                </div>
-                
-                <div className="flex items-baseline justify-between border-b border-ink/10 pb-4 mb-6">
-                   <div>
-                     <span className="text-[10px] font-bold text-ink-muted tracking-[0.2em] uppercase block mb-1">Duration</span>
-                     <span className="font-serif text-3xl text-ink">45 Min</span>
-                   </div>
-                   <span className="text-[10px] font-bold text-green-700 tracking-widest uppercase bg-green-100 px-3 py-1 rounded-sm">Free</span>
-                </div>
-                
-                <h2 className="font-serif text-3xl text-ink mb-4">Fit Check</h2>
-                <p className="text-ink-muted text-sm leading-relaxed mb-8 font-serif italic">
-                   "Introductory call to map your territory and identify potential leverage points."
-                </p>
-             </div>
-
-             <div className="mt-auto pt-6 border-t border-ink/5 text-[10px] text-ink-muted/60 uppercase tracking-wider flex justify-between items-center">
-                <span>DaVeenci Consulting</span>
-                <span>GMT-5</span>
-             </div>
-          </div>
-
-          {/* Right Panel: Calendar & Time */}
-          <div className="w-full md:w-7/12 p-8 md:p-12 bg-white relative flex flex-col items-center justify-center z-10">
-             
-             {booked ? (
-                <div className="h-full flex flex-col items-center justify-center text-center animate-in fade-in duration-500 w-full">
-                   <div className="w-16 h-16 bg-green-100 text-green-800 rounded-full flex items-center justify-center mb-6">
-                      <Check className="w-8 h-8" />
-                   </div>
-                   <h3 className="font-serif text-3xl text-ink mb-3">Booking Confirmed</h3>
-                   <p className="text-ink-muted mb-1">
-                      {selectedDate?.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                   </p>
-                   <p className="text-xl text-ink font-serif mb-8">at {selectedTime}</p>
-                   <Button variant="secondary" onClick={resetBooking} className="text-sm px-6 py-3">Book Another</Button>
-                </div>
-             ) : (
-               <div className="w-full max-w-[360px]">
-                 {view === 'calendar' ? (
-                    <div className="animate-in slide-in-from-right-4 duration-300">
-                       <div className="flex items-center justify-between mb-6">
-                          <button onClick={handlePrevMonth} className="p-2 hover:bg-ink/5 rounded-full transition-colors text-ink-muted">
-                             <ChevronLeft className="w-5 h-5" />
-                          </button>
-                          <h3 className="font-serif text-lg text-ink tracking-wide font-medium">
-                             {monthNames[currentDate.getMonth()]} <span className="text-ink-muted ml-1">{currentDate.getFullYear()}</span>
-                          </h3>
-                          <button onClick={handleNextMonth} className="p-2 hover:bg-ink/5 rounded-full transition-colors text-ink-muted">
-                             <ChevronRight className="w-5 h-5" />
-                          </button>
-                       </div>
-
-                       <div className="grid grid-cols-7 gap-2 mb-2 text-center">
-                          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
-                             <div key={day} className="text-[10px] font-bold text-ink-muted/60 uppercase tracking-wider">
-                                {day}
-                             </div>
-                          ))}
-                       </div>
-
-                       <div className="grid grid-cols-7 gap-2 text-sm">
-                          {blanksArray.map((_, i) => <div key={`blank-${i}`} className="w-10 h-10" />)}
-                          {daysArray.map(day => (
-                             <button 
-                                key={day}
-                                onClick={() => handleDateClick(day)}
-                                className="w-10 h-10 flex items-center justify-center text-ink hover:bg-accent hover:text-white hover:shadow-lg hover:scale-110 rounded-sm transition-all duration-200 focus:outline-none text-sm font-medium"
-                             >
-                                {day}
-                             </button>
-                          ))}
-                       </div>
-                    </div>
-                 ) : (
-                    <div className="w-full flex flex-col animate-in slide-in-from-right-4 duration-300">
-                       <div className="flex items-center justify-between mb-6">
-                         <button 
-                            onClick={() => setView('calendar')} 
-                            className="flex items-center text-xs font-bold text-ink-muted uppercase tracking-wider hover:text-accent transition-colors"
-                         >
-                            <ChevronLeft className="w-3 h-3 mr-1" /> Back
-                         </button>
-                         <h3 className="font-serif text-lg text-ink">
-                           {selectedDate?.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                         </h3>
-                       </div>
-
-                       <div className="grid grid-cols-2 gap-3 mb-8">
-                          {availableTimeSlots.map((time) => (
-                             <button
-                                key={time}
-                                onClick={() => handleTimeSelect(time)}
-                                className={`py-3 px-4 border rounded-sm text-sm font-medium transition-all duration-200 ${
-                                   selectedTime === time 
-                                   ? 'bg-accent text-white border-accent shadow-xl scale-105' 
-                                   : 'bg-white border-ink/10 text-ink hover:border-accent hover:text-accent hover:shadow-md hover:-translate-y-0.5'
-                                }`}
-                             >
-                                {time}
-                             </button>
-                          ))}
-                       </div>
-
-                       {selectedTime && (
-                          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                             <Button variant="primary" onClick={handleBooking} className="w-full">Confirm Booking</Button>
-                          </div>
-                       )}
-                    </div>
-                 )}
+       <ScrollReveal delay={100}>
+         <div className="max-w-5xl mx-auto bg-base shadow-[0_20px_50px_-10px_rgba(0,0,0,0.1)] hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.15)] border border-ink/10 rounded-sm overflow-hidden flex flex-col md:flex-row min-h-[480px] transition-shadow duration-500">
+            {/* Left Panel: Service Details */}
+            <div className="w-full md:w-5/12 p-8 md:p-10 border-r border-ink/10 bg-base relative flex flex-col justify-between z-10">
+               <div>
+                  <div className="w-12 h-12 bg-ink text-base flex items-center justify-center rounded-sm mb-8 shadow-md">
+                     <CalendarIcon className="w-6 h-6" />
+                  </div>
+                  
+                  <div className="flex items-baseline justify-between border-b border-ink/10 pb-4 mb-6">
+                     <div>
+                       <span className="text-[10px] font-bold text-ink-muted tracking-[0.2em] uppercase block mb-1">Duration</span>
+                       <span className="font-serif text-3xl text-ink">45 Min</span>
+                     </div>
+                     <span className="text-[10px] font-bold text-green-700 tracking-widest uppercase bg-green-100 px-3 py-1 rounded-sm">Free</span>
+                  </div>
+                  
+                  <h2 className="font-serif text-3xl text-ink mb-4">Fit Check</h2>
+                  <p className="text-ink-muted text-sm leading-relaxed mb-8 font-serif italic">
+                     "Introductory call to map your territory and identify potential leverage points."
+                  </p>
                </div>
-             )}
-          </div>
-       </div>
+
+               <div className="mt-auto pt-6 border-t border-ink/5 text-[10px] text-ink-muted/60 uppercase tracking-wider flex justify-between items-center">
+                  <span>DaVeenci Consulting</span>
+                  <span>GMT-5</span>
+               </div>
+            </div>
+
+            {/* Right Panel: Calendar & Time */}
+            <div className="w-full md:w-7/12 p-8 md:p-12 bg-white relative flex flex-col items-center justify-center z-10">
+               
+               {booked ? (
+                  <div className="h-full flex flex-col items-center justify-center text-center animate-in fade-in duration-500 w-full">
+                     <div className="w-16 h-16 bg-green-100 text-green-800 rounded-full flex items-center justify-center mb-6">
+                        <Check className="w-8 h-8" />
+                     </div>
+                     <h3 className="font-serif text-3xl text-ink mb-3">Booking Confirmed</h3>
+                     <p className="text-ink-muted mb-1">
+                        {selectedDate?.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                     </p>
+                     <p className="text-xl text-ink font-serif mb-8">at {selectedTime}</p>
+                     <Button variant="secondary" onClick={resetBooking} className="text-sm px-6 py-3">Book Another</Button>
+                  </div>
+               ) : (
+                 <div className="w-full max-w-[360px]">
+                   {view === 'calendar' ? (
+                      <div className="animate-in slide-in-from-right-4 duration-300">
+                         <div className="flex items-center justify-between mb-6">
+                            <button onClick={handlePrevMonth} className="p-2 hover:bg-ink/5 rounded-full transition-colors text-ink-muted">
+                               <ChevronLeft className="w-5 h-5" />
+                            </button>
+                            <h3 className="font-serif text-lg text-ink tracking-wide font-medium">
+                               {monthNames[currentDate.getMonth()]} <span className="text-ink-muted ml-1">{currentDate.getFullYear()}</span>
+                            </h3>
+                            <button onClick={handleNextMonth} className="p-2 hover:bg-ink/5 rounded-full transition-colors text-ink-muted">
+                               <ChevronRight className="w-5 h-5" />
+                            </button>
+                         </div>
+
+                         <div className="grid grid-cols-7 gap-2 mb-2 text-center">
+                            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
+                               <div key={day} className="text-[10px] font-bold text-ink-muted/60 uppercase tracking-wider">
+                                  {day}
+                                </div>
+                            ))}
+                         </div>
+
+                         <div className="grid grid-cols-7 gap-2 text-sm">
+                            {blanksArray.map((_, i) => <div key={`blank-${i}`} className="w-10 h-10" />)}
+                            {daysArray.map(day => (
+                               <button 
+                                  key={day}
+                                  onClick={() => handleDateClick(day)}
+                                  className="w-10 h-10 flex items-center justify-center text-ink hover:bg-accent hover:text-white hover:shadow-lg hover:scale-110 rounded-sm transition-all duration-200 focus:outline-none text-sm font-medium"
+                               >
+                                  {day}
+                               </button>
+                            ))}
+                         </div>
+                      </div>
+                   ) : (
+                      <div className="w-full flex flex-col animate-in slide-in-from-right-4 duration-300">
+                         <div className="flex items-center justify-between mb-6">
+                           <button 
+                              onClick={() => setView('calendar')} 
+                              className="flex items-center text-xs font-bold text-ink-muted uppercase tracking-wider hover:text-accent transition-colors"
+                           >
+                              <ChevronLeft className="w-3 h-3 mr-1" /> Back
+                           </button>
+                           <h3 className="font-serif text-lg text-ink">
+                             {selectedDate?.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                           </h3>
+                         </div>
+
+                         <div className="grid grid-cols-2 gap-3 mb-8">
+                            {availableTimeSlots.map((time) => (
+                               <button
+                                  key={time}
+                                  onClick={() => handleTimeSelect(time)}
+                                  className={`py-3 px-4 border rounded-sm text-sm font-medium transition-all duration-200 ${
+                                     selectedTime === time 
+                                     ? 'bg-accent text-white border-accent shadow-xl scale-105' 
+                                     : 'bg-white border-ink/10 text-ink hover:border-accent hover:text-accent hover:shadow-md hover:-translate-y-0.5'
+                                  }`}
+                               >
+                                  {time}
+                               </button>
+                            ))}
+                         </div>
+
+                         {selectedTime && (
+                            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                               <Button variant="primary" onClick={handleBooking} className="w-full">Confirm Booking</Button>
+                            </div>
+                         )}
+                      </div>
+                   )}
+                 </div>
+               )}
+            </div>
+         </div>
+       </ScrollReveal>
     </Section>
   );
 };
@@ -727,32 +917,36 @@ const DaVeenciLandingPage: React.FC = () => {
       <Section className="pt-40 pb-24 md:pt-48 md:pb-32 min-h-screen flex items-center">
         {/* Background Elements for Hero */}
         <VitruvianBackground className="opacity-[0.12] -right-1/4 scale-125" />
-        <NodeNetworkBackground className="opacity-[0.15]" />
+        {/* NodeNetworkBackground removed as requested */}
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           <div className="lg:col-span-6 relative z-20">
-            <span className="block mb-4 font-script text-2xl text-accent -rotate-2 origin-bottom-left">
-              Folio I — The Thesis
-            </span>
-            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-ink leading-[1.1] mb-8">
-              Clarity on AI.<br />
-              <span className="italic text-ink-muted/80">Automation that Ships.</span>
-            </h1>
-            <p className="font-sans text-xl md:text-2xl text-ink-muted max-w-2xl leading-relaxed mb-10">
-              DaVeenci helps founders, investors, and operators turn AI from slideware into shipped workflows—so teams can scale revenue and margin without scaling headcount.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <Button variant="primary" onClick={scrollToBooking}>Book a Strategy Session</Button>
-              <Button variant="secondary">See How We Work</Button>
-            </div>
-            <p className="text-xs md:text-sm text-ink-muted/60 font-medium tracking-wide">
-              Built for early-stage to growth companies in B2B SaaS, services, and tech-enabled businesses.
-            </p>
+            <ScrollReveal delay={200}>
+              <span className="block mb-4 font-script text-2xl text-accent -rotate-2 origin-bottom-left">
+                Folio I — The Thesis
+              </span>
+              <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-ink leading-[1.1] mb-8">
+                Clarity on AI.<br />
+                <span className="italic text-ink-muted/80">Automation that Ships.</span>
+              </h1>
+              <p className="font-sans text-xl md:text-2xl text-ink-muted max-w-2xl leading-relaxed mb-10">
+                DaVeenci helps founders, investors, and operators turn AI from slideware into shipped workflows—so teams can scale revenue and margin without scaling headcount.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                <Button variant="primary" onClick={scrollToBooking}>Book a Strategy Session</Button>
+                <Button variant="secondary">See How We Work</Button>
+              </div>
+              <p className="text-xs md:text-sm text-ink-muted/60 font-medium tracking-wide">
+                Built for early-stage to growth companies in B2B SaaS, services, and tech-enabled businesses.
+              </p>
+            </ScrollReveal>
           </div>
           
           {/* System Diagram Visual Area */}
           <div className="lg:col-span-6 relative h-[500px] flex items-center justify-center">
-            <HeroDiagram />
+            <ScrollReveal delay={500} direction="left" className="w-full flex justify-center">
+              <HeroDiagram />
+            </ScrollReveal>
           </div>
         </div>
       </Section>
@@ -765,15 +959,21 @@ const DaVeenciLandingPage: React.FC = () => {
           subtitle="Most companies have 'AI Initiatives'. Few have shipped outcomes."
         />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <Card title="The Pilot Purgatory" label="Symptom A">
-            <p>You have 12 distinct experiments running. None are production-grade. Your team is "learning" but not shipping.</p>
-          </Card>
-          <Card title="The Tool Fatigue" label="Symptom B">
-            <p>Subscriptions to ChatGPT Team, Claude, Jasper, and Copy.ai—yet work is still being done manually in spreadsheets.</p>
-          </Card>
-          <Card title="The Margin Squeeze" label="Symptom C">
-            <p>Revenue is growing, but headcount costs are growing faster. You need to break the linear relationship between growth and hiring.</p>
-          </Card>
+          <ScrollReveal delay={100}>
+            <Card title="The Pilot Purgatory" label="Symptom A">
+              <p>You have 12 distinct experiments running. None are production-grade. Your team is "learning" but not shipping.</p>
+            </Card>
+          </ScrollReveal>
+          <ScrollReveal delay={300}>
+            <Card title="The Tool Fatigue" label="Symptom B">
+              <p>Subscriptions to ChatGPT Team, Claude, Jasper, and Copy.ai—yet work is still being done manually in spreadsheets.</p>
+            </Card>
+          </ScrollReveal>
+          <ScrollReveal delay={500}>
+            <Card title="The Margin Squeeze" label="Symptom C">
+              <p>Revenue is growing, but headcount costs are growing faster. You need to break the linear relationship between growth and hiring.</p>
+            </Card>
+          </ScrollReveal>
         </div>
       </Section>
 
@@ -789,80 +989,121 @@ const DaVeenciLandingPage: React.FC = () => {
            
            {/* Feature 1: CRM */}
            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-             <div className="lg:col-span-5 space-y-6">
-                <div className="w-12 h-12 bg-accent/10 text-accent flex items-center justify-center rounded-sm mb-4">
-                  <GitGraph className="w-6 h-6" />
-                </div>
-                <h3 className="font-serif text-3xl text-ink">Sales & Pipeline Ops</h3>
-                <p className="text-ink-muted text-lg leading-relaxed">
-                   Stop manually enriching leads or copy-pasting data between tools. We build self-healing pipelines that enrich contacts, draft personalized outreach, and update your CRM automatically.
-                </p>
-                <ul className="space-y-3 mt-4">
-                  <li className="flex items-center gap-3 text-ink text-sm font-medium">
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Automated Lead Enrichment
-                  </li>
-                  <li className="flex items-center gap-3 text-ink text-sm font-medium">
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> CRM Hygiene & Deduplication
-                  </li>
-                  <li className="flex items-center gap-3 text-ink text-sm font-medium">
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Slack Alerts for High-Intent Leads
-                  </li>
-                </ul>
+             <div className="lg:col-span-5 space-y-6 order-2 lg:order-1">
+                <ScrollReveal direction="right">
+                  <div className="w-12 h-12 bg-accent/10 text-accent flex items-center justify-center rounded-sm mb-4">
+                    <GitGraph className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-serif text-3xl text-ink">Sales & Pipeline Ops</h3>
+                  <p className="text-ink-muted text-lg leading-relaxed">
+                     Stop manually enriching leads or copy-pasting data between tools. We build self-healing pipelines that enrich contacts, draft personalized outreach, and update your CRM automatically.
+                  </p>
+                  <ul className="space-y-3 mt-4">
+                    <li className="flex items-center gap-3 text-ink text-sm font-medium">
+                      <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Automated Lead Enrichment
+                    </li>
+                    <li className="flex items-center gap-3 text-ink text-sm font-medium">
+                      <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> CRM Hygiene & Deduplication
+                    </li>
+                    <li className="flex items-center gap-3 text-ink text-sm font-medium">
+                      <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Slack Alerts for High-Intent Leads
+                    </li>
+                  </ul>
+                </ScrollReveal>
              </div>
-             <div className="lg:col-span-7 flex justify-center lg:justify-end">
-                <CRMFlowDiagram />
+             <div className="lg:col-span-7 flex justify-center lg:justify-end order-1 lg:order-2">
+                <ScrollReveal direction="left" delay={200}>
+                  <CRMFlowDiagram />
+                </ScrollReveal>
              </div>
            </div>
 
            {/* Feature 2: Marketing */}
            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-             <div className="lg:col-span-7 flex justify-center lg:justify-start order-2 lg:order-1">
-                <MarketingEngineDiagram />
+             <div className="lg:col-span-7 flex justify-center lg:justify-start order-1">
+                <ScrollReveal direction="right" delay={200}>
+                  <MarketingEngineDiagram />
+                </ScrollReveal>
              </div>
-             <div className="lg:col-span-5 space-y-6 order-1 lg:order-2">
-                <div className="w-12 h-12 bg-accent/10 text-accent flex items-center justify-center rounded-sm mb-4">
-                  <Settings className="w-6 h-6" />
-                </div>
-                <h3 className="font-serif text-3xl text-ink">Content & Marketing Engine</h3>
-                <p className="text-ink-muted text-lg leading-relaxed">
-                   Turn one seed asset into a month of content. Our workflows take a single video or webinar and automatically generate blog posts, newsletters, and social threads—maintaining your unique voice.
-                </p>
-                <ul className="space-y-3 mt-4">
-                  <li className="flex items-center gap-3 text-ink text-sm font-medium">
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Video to Blog Transformation
-                  </li>
-                  <li className="flex items-center gap-3 text-ink text-sm font-medium">
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Newsletter Auto-Drafting
-                  </li>
-                  <li className="flex items-center gap-3 text-ink text-sm font-medium">
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Social Media Clipping
-                  </li>
-                </ul>
+             <div className="lg:col-span-5 space-y-6 order-2">
+                <ScrollReveal direction="left">
+                  <div className="w-12 h-12 bg-accent/10 text-accent flex items-center justify-center rounded-sm mb-4">
+                    <Settings className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-serif text-3xl text-ink">Content & Marketing Engine</h3>
+                  <p className="text-ink-muted text-lg leading-relaxed">
+                     Turn one seed asset into a month of content. Our workflows take a single video or webinar and automatically generate blog posts, newsletters, and social threads—maintaining your unique voice.
+                  </p>
+                  <ul className="space-y-3 mt-4">
+                    <li className="flex items-center gap-3 text-ink text-sm font-medium">
+                      <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Video to Blog Transformation
+                    </li>
+                    <li className="flex items-center gap-3 text-ink text-sm font-medium">
+                      <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Newsletter Auto-Drafting
+                    </li>
+                    <li className="flex items-center gap-3 text-ink text-sm font-medium">
+                      <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Social Media Clipping
+                    </li>
+                  </ul>
+                </ScrollReveal>
+             </div>
+           </div>
+
+           {/* Feature 3: Operations (New) */}
+           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+             <div className="lg:col-span-5 space-y-6 order-2 lg:order-1">
+                <ScrollReveal direction="right">
+                  <div className="w-12 h-12 bg-accent/10 text-accent flex items-center justify-center rounded-sm mb-4">
+                    <Cpu className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-serif text-3xl text-ink">Operational Cost & Logic</h3>
+                  <p className="text-ink-muted text-lg leading-relaxed">
+                     Reclaim the 30% of opex lost to coordination drag. We replace human dispatchers, secretaries, and concierges with always-on AI agents that handle logistics, scheduling, and first-line support with zero latency.
+                  </p>
+                  <ul className="space-y-3 mt-4">
+                    <li className="flex items-center gap-3 text-ink text-sm font-medium">
+                      <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> 24/7 AI Voice Receptionist
+                    </li>
+                    <li className="flex items-center gap-3 text-ink text-sm font-medium">
+                      <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Smart Dispatch & Routing
+                    </li>
+                    <li className="flex items-center gap-3 text-ink text-sm font-medium">
+                      <div className="w-1.5 h-1.5 rounded-full bg-accent"></div> Executive Admin Automation
+                    </li>
+                  </ul>
+                </ScrollReveal>
+             </div>
+             <div className="lg:col-span-7 flex justify-center lg:justify-end order-1 lg:order-2">
+                <ScrollReveal direction="left" delay={200}>
+                  <OpsDiagram />
+                </ScrollReveal>
              </div>
            </div>
            
-           {/* Feature 3: Customer Success (Compact) */}
-           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-12 border-t border-ink/10">
-              <div className="col-span-1 lg:col-span-1">
-                 <h4 className="font-serif text-2xl text-ink mb-4">Also Available: Customer Success</h4>
-              </div>
-              <div className="col-span-1 lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
-                 <div className="flex gap-4">
-                    <Zap className="w-6 h-6 text-ink-muted mt-1 flex-shrink-0" />
-                    <div>
-                       <h5 className="font-medium text-ink mb-1">Support Triage</h5>
-                       <p className="text-sm text-ink-muted">Auto-labeling and routing tickets based on sentiment and urgency.</p>
-                    </div>
-                 </div>
-                 <div className="flex gap-4">
-                    <MessageSquare className="w-6 h-6 text-ink-muted mt-1 flex-shrink-0" />
-                    <div>
-                       <h5 className="font-medium text-ink mb-1">Draft Responses</h5>
-                       <p className="text-sm text-ink-muted">AI-drafted replies for Tier 1 tickets, ready for human review.</p>
-                    </div>
-                 </div>
-              </div>
-           </div>
+           {/* Feature 4: Customer Success (Compact) */}
+           <ScrollReveal delay={200}>
+             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-12 border-t border-ink/10">
+                <div className="col-span-1 lg:col-span-1">
+                   <h4 className="font-serif text-2xl text-ink mb-4">Also Available: Customer Success</h4>
+                </div>
+                <div className="col-span-1 lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
+                   <div className="flex gap-4">
+                      <Zap className="w-6 h-6 text-ink-muted mt-1 flex-shrink-0" />
+                      <div>
+                         <h5 className="font-medium text-ink mb-1">Support Triage</h5>
+                         <p className="text-sm text-ink-muted">Auto-labeling and routing tickets based on sentiment and urgency.</p>
+                      </div>
+                   </div>
+                   <div className="flex gap-4">
+                      <MessageSquare className="w-6 h-6 text-ink-muted mt-1 flex-shrink-0" />
+                      <div>
+                         <h5 className="font-medium text-ink mb-1">Draft Responses</h5>
+                         <p className="text-sm text-ink-muted">AI-drafted replies for Tier 1 tickets, ready for human review.</p>
+                      </div>
+                   </div>
+                </div>
+             </div>
+           </ScrollReveal>
 
         </div>
       </Section>
@@ -876,7 +1117,7 @@ const DaVeenciLandingPage: React.FC = () => {
             subtitle="Join the conversation with industry leaders, founders, and builders."
           />
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
              {[
                 {
                    image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=800",
@@ -897,7 +1138,9 @@ const DaVeenciLandingPage: React.FC = () => {
                    description: "Learn how to run AI apps on infrastructure you actually control. We’ll cover the essentials of hosting, servers, and GPU access."
                 }
              ].map((event, idx) => (
-                <CodexEventCard key={idx} index={idx} {...event} />
+                <ScrollReveal key={idx} delay={idx * 150} className="h-full">
+                  <CodexEventCard index={idx} {...event} />
+                </ScrollReveal>
              ))}
           </div>
         </div>
@@ -905,16 +1148,18 @@ const DaVeenciLandingPage: React.FC = () => {
 
       {/* 5. About — The Philosophy */}
       <Section id="about" pattern="circles">
-         <div className="max-w-4xl mx-auto text-center">
-            <Logo className="w-16 h-16 text-ink mx-auto mb-8" />
-            <h2 className="font-serif text-4xl md:text-5xl text-ink mb-8 leading-tight">
-               "Simplicity is the ultimate sophistication."
-            </h2>
-            <p className="text-ink-muted text-lg md:text-xl leading-relaxed mb-8">
-               DaVeenci isn't about using the flashiest new model. It's about the engineering of elegance. We believe that the best automation is the one you don't notice—it just works, silently compounding your leverage every single day.
-            </p>
-            <div className="w-24 h-1 bg-accent mx-auto opacity-50"></div>
-         </div>
+         <ScrollReveal>
+           <div className="max-w-4xl mx-auto text-center">
+              <Logo className="w-16 h-16 text-ink mx-auto mb-8" />
+              <h2 className="font-serif text-4xl md:text-5xl text-ink mb-8 leading-tight">
+                 "Simplicity is the ultimate sophistication."
+              </h2>
+              <p className="text-ink-muted text-lg md:text-xl leading-relaxed mb-8">
+                 DaVeenci isn't about using the flashiest new model. It's about the engineering of elegance. We believe that the best automation is the one you don't notice—it just works, silently compounding your leverage every single day.
+              </p>
+              <div className="w-24 h-1 bg-accent mx-auto opacity-50"></div>
+           </div>
+         </ScrollReveal>
       </Section>
 
       {/* 6. Booking Section (Updated) */}
@@ -932,84 +1177,92 @@ const DaVeenciLandingPage: React.FC = () => {
          />
 
          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-            <BriefingCard 
-              title="The Agentic Workflow"
-              description="Why chat interfaces are a dead end, and how to architect autonomous agent swarms that do the work for you."
-              image="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=800"
-              issueNo="042"
-              category="Architecture"
-            />
-            <BriefingCard 
-              title="Synthetic Data Pipelines"
-              description="Running out of human data? Here is the playbook for generating high-fidelity synthetic datasets to fine-tune your models."
-              image="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800"
-              issueNo="043"
-              category="Engineering"
-            />
-            <BriefingCard 
-              title="The Zero-Touch CRM"
-              description="A technical deep dive into self-healing customer databases that enrich themselves without sales rep intervention."
-              image="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800"
-              issueNo="044"
-              category="Operations"
-            />
+            <ScrollReveal delay={100}>
+              <BriefingCard 
+                title="The Agentic Workflow"
+                description="Why chat interfaces are a dead end, and how to architect autonomous agent swarms that do the work for you."
+                image="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=800"
+                issueNo="042"
+                category="Architecture"
+              />
+            </ScrollReveal>
+            <ScrollReveal delay={300}>
+              <BriefingCard 
+                title="Synthetic Data Pipelines"
+                description="Running out of human data? Here is the playbook for generating high-fidelity synthetic datasets to fine-tune your models."
+                image="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800"
+                issueNo="043"
+                category="Engineering"
+              />
+            </ScrollReveal>
+            <ScrollReveal delay={500}>
+              <BriefingCard 
+                title="The Zero-Touch CRM"
+                description="A technical deep dive into self-healing customer databases that enrich themselves without sales rep intervention."
+                image="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800"
+                issueNo="044"
+                category="Operations"
+              />
+            </ScrollReveal>
          </div>
 
          {/* Registration Box */}
-         <div className="max-w-5xl mx-auto bg-white border border-ink/10 p-8 md:p-12 relative overflow-hidden shadow-2xl shadow-ink/5 rounded-sm">
-            {/* Decorative background graphic */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
-            <GridPattern className="opacity-[0.3]" />
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
-               <div className="pr-0 lg:pr-8">
-                  <div className="flex items-center gap-3 mb-4">
-                     <Mail className="w-5 h-5 text-accent" />
-                     <span className="font-mono text-xs font-bold text-accent uppercase tracking-widest">Weekly Intelligence</span>
-                  </div>
-                  <h3 className="font-serif text-3xl md:text-4xl text-ink mb-4 leading-tight">Join the Guild</h3>
-                  <p className="text-ink-muted text-lg mb-8 leading-relaxed font-serif italic">
-                     "Receive one high-leverage automation play every Tuesday. No fluff, just blueprints."
-                  </p>
-                  <div className="flex items-center gap-4 text-sm text-ink-muted/80 font-medium">
-                     <div className="flex -space-x-3">
-                        {[1,2,3,4].map(i => (
-                           <div key={i} className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center overflow-hidden">
-                              <img src={`https://i.pravatar.cc/100?img=${10+i}`} alt="Member" className="w-full h-full object-cover grayscale" />
-                           </div>
-                        ))}
+         <ScrollReveal delay={200}>
+           <div className="max-w-5xl mx-auto bg-white border border-ink/10 p-8 md:p-12 relative overflow-hidden shadow-2xl shadow-ink/5 rounded-sm">
+              {/* Decorative background graphic */}
+              <div className="absolute top-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+              <GridPattern className="opacity-[0.3]" />
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+                 <div className="pr-0 lg:pr-8">
+                    <div className="flex items-center gap-3 mb-4">
+                       <Mail className="w-5 h-5 text-accent" />
+                       <span className="font-mono text-xs font-bold text-accent uppercase tracking-widest">Weekly Intelligence</span>
+                    </div>
+                    <h3 className="font-serif text-3xl md:text-4xl text-ink mb-4 leading-tight">Join the Guild</h3>
+                    <p className="text-ink-muted text-lg mb-8 leading-relaxed font-serif italic">
+                       "Receive one high-leverage automation play every Tuesday. No fluff, just blueprints."
+                    </p>
+                    <div className="flex items-center gap-4 text-sm text-ink-muted/80 font-medium">
+                       <div className="flex -space-x-3">
+                          {[1,2,3,4].map(i => (
+                             <div key={i} className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center overflow-hidden">
+                                <img src={`https://i.pravatar.cc/100?img=${10+i}`} alt="Member" className="w-full h-full object-cover grayscale" />
+                             </div>
+                          ))}
+                       </div>
+                       <span className="text-xs uppercase tracking-wider">Join 2,000+ Operators</span>
+                    </div>
+                 </div>
+
+                 <div className="bg-base p-8 border border-ink/10 rounded-sm shadow-sm relative">
+                     {/* Corner marks */}
+                     <div className="absolute top-2 left-2 w-2 h-2 border-t border-l border-ink/20"></div>
+                     <div className="absolute top-2 right-2 w-2 h-2 border-t border-r border-ink/20"></div>
+                     <div className="absolute bottom-2 left-2 w-2 h-2 border-b border-l border-ink/20"></div>
+                     <div className="absolute bottom-2 right-2 w-2 h-2 border-b border-r border-ink/20"></div>
+
+                     <div className="flex flex-col gap-4 relative z-10">
+                        <div>
+                          <label className="block text-[10px] font-bold text-ink uppercase tracking-widest mb-2">Email Address</label>
+                          <input 
+                            type="email" 
+                            placeholder="leonardo@florence.it" 
+                            className="w-full bg-white border border-ink/20 px-4 py-3 text-ink placeholder:text-ink-muted/40 focus:outline-none focus:border-accent transition-all shadow-inner"
+                          />
+                        </div>
+                        <Button variant="primary" className="w-full justify-between group">
+                           <span>Subscribe to Codex</span>
+                           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                        <p className="text-[10px] text-ink-muted/50 text-center mt-1">
+                           Unsubscribe at any time. We respect your inbox.
+                        </p>
                      </div>
-                     <span className="text-xs uppercase tracking-wider">Join 2,000+ Operators</span>
-                  </div>
-               </div>
-
-               <div className="bg-base p-8 border border-ink/10 rounded-sm shadow-sm relative">
-                   {/* Corner marks */}
-                   <div className="absolute top-2 left-2 w-2 h-2 border-t border-l border-ink/20"></div>
-                   <div className="absolute top-2 right-2 w-2 h-2 border-t border-r border-ink/20"></div>
-                   <div className="absolute bottom-2 left-2 w-2 h-2 border-b border-l border-ink/20"></div>
-                   <div className="absolute bottom-2 right-2 w-2 h-2 border-b border-r border-ink/20"></div>
-
-                   <div className="flex flex-col gap-4 relative z-10">
-                      <div>
-                        <label className="block text-[10px] font-bold text-ink uppercase tracking-widest mb-2">Email Address</label>
-                        <input 
-                          type="email" 
-                          placeholder="leonardo@florence.it" 
-                          className="w-full bg-white border border-ink/20 px-4 py-3 text-ink placeholder:text-ink-muted/40 focus:outline-none focus:border-accent transition-all shadow-inner"
-                        />
-                      </div>
-                      <Button variant="primary" className="w-full justify-between group">
-                         <span>Subscribe to Codex</span>
-                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </Button>
-                      <p className="text-[10px] text-ink-muted/50 text-center mt-1">
-                         Unsubscribe at any time. We respect your inbox.
-                      </p>
-                   </div>
-               </div>
-            </div>
-         </div>
+                 </div>
+              </div>
+           </div>
+         </ScrollReveal>
       </Section>
 
       {/* 8. Footer */}
