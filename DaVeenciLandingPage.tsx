@@ -92,12 +92,6 @@ const Logo: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 );
 
-const ScrollIcon: React.FC = () => (
-    <div className="w-6 h-6 border border-ink/30 rounded-sm flex items-center justify-center transform rotate-45">
-        <div className="w-1 h-1 bg-ink rounded-full" />
-    </div>
-)
-
 // --- New System Architecture Visuals ---
 
 const HeroDiagram: React.FC = () => (
@@ -169,21 +163,6 @@ const HeroDiagram: React.FC = () => (
         </div>
 
     </div>
-  </div>
-);
-
-const ProcessDiagram: React.FC = () => (
-  <div className="hidden md:block absolute top-20 left-0 w-full h-32 pointer-events-none z-0">
-     <svg className="w-full h-full" preserveAspectRatio="none">
-        {/* Connecting curve from 1 to 2 */}
-        <path d="M 200 60 C 350 60, 400 20, 600 40" fill="none" stroke="#E4D6BD" strokeWidth="2" strokeDasharray="8 4" />
-        {/* Connecting curve from 2 to 3 */}
-        <path d="M 700 40 C 850 60, 900 60, 1100 60" fill="none" stroke="#E4D6BD" strokeWidth="2" strokeDasharray="8 4" />
-        
-        {/* Decorative Nodes on path */}
-        <circle cx="475" cy="30" r="3" fill="#3f84c8" />
-        <circle cx="900" cy="55" r="3" fill="#3f84c8" />
-     </svg>
   </div>
 );
 
@@ -276,6 +255,7 @@ const BookingSection: React.FC = () => {
   const [view, setView] = useState<'calendar' | 'time'>('calendar');
   const [booked, setBooked] = useState(false);
 
+  // Slots from 7 AM to 1 PM
   const availableTimeSlots = [
     "07:00 AM", "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM"
   ];
@@ -334,12 +314,13 @@ const BookingSection: React.FC = () => {
           <p className="text-ink-muted">Secure your spot for a Fit Check.</p>
        </div>
 
-       <div className="max-w-4xl mx-auto bg-base shadow-2xl shadow-ink/10 border border-ink/10 rounded-sm overflow-hidden flex flex-col md:flex-row">
+       {/* Wider container: max-w-5xl for a better aspect ratio */}
+       <div className="max-w-5xl mx-auto bg-base shadow-2xl shadow-ink/10 border border-ink/10 rounded-sm overflow-hidden flex flex-col md:flex-row min-h-[480px]">
           {/* Left Panel: Service Details */}
-          <div className="w-full md:w-5/12 p-6 md:p-8 border-r border-ink/10 bg-base relative flex flex-col justify-between">
+          <div className="w-full md:w-5/12 p-8 md:p-10 border-r border-ink/10 bg-base relative flex flex-col justify-between">
              <div>
-                <div className="w-14 h-14 bg-ink text-base flex items-center justify-center rounded-sm mb-8 shadow-md">
-                   <CalendarIcon className="w-7 h-7" />
+                <div className="w-12 h-12 bg-ink text-base flex items-center justify-center rounded-sm mb-8 shadow-md">
+                   <CalendarIcon className="w-6 h-6" />
                 </div>
                 
                 <div className="flex items-baseline justify-between border-b border-ink/10 pb-4 mb-6">
@@ -347,117 +328,95 @@ const BookingSection: React.FC = () => {
                      <span className="text-[10px] font-bold text-ink-muted tracking-[0.2em] uppercase block mb-1">Duration</span>
                      <span className="font-serif text-3xl text-ink">45 Min</span>
                    </div>
-                   <span className="text-xs font-bold text-green-700 tracking-widest uppercase bg-green-100 px-2 py-1 rounded-sm">Free</span>
+                   <span className="text-[10px] font-bold text-green-700 tracking-widest uppercase bg-green-100 px-3 py-1 rounded-sm">Free</span>
                 </div>
                 
                 <h2 className="font-serif text-3xl text-ink mb-4">Fit Check</h2>
                 <p className="text-ink-muted text-sm leading-relaxed mb-8 font-serif italic">
                    "Introductory call to map your territory and identify potential leverage points."
                 </p>
-
-                <div className="space-y-4">
-                   <div className="flex items-start gap-3">
-                      <div className="w-1.5 h-1.5 mt-2 rotate-45 bg-accent"></div>
-                      <span className="text-sm text-ink-muted">Overview of challenges</span>
-                   </div>
-                   <div className="flex items-start gap-3">
-                      <div className="w-1.5 h-1.5 mt-2 rotate-45 bg-accent"></div>
-                      <span className="text-sm text-ink-muted">Initial fit assessment</span>
-                   </div>
-                   <div className="flex items-start gap-3">
-                      <div className="w-1.5 h-1.5 mt-2 rotate-45 bg-accent"></div>
-                      <span className="text-sm text-ink-muted">Next steps discussion</span>
-                   </div>
-                </div>
              </div>
 
-             <div className="mt-8 pt-6 border-t border-ink/5 text-xs text-ink-muted/60 uppercase tracking-wider">
-                DaVeenci Consulting
+             <div className="mt-auto pt-6 border-t border-ink/5 text-[10px] text-ink-muted/60 uppercase tracking-wider flex justify-between items-center">
+                <span>DaVeenci Consulting</span>
+                <span>GMT-5</span>
              </div>
           </div>
 
           {/* Right Panel: Calendar & Time */}
-          <div className="w-full md:w-7/12 p-6 md:p-8 bg-[#F9F7F2] relative flex flex-col">
+          <div className="w-full md:w-7/12 p-8 md:p-12 bg-[#F9F7F2] relative flex flex-col items-center justify-center">
              
              {booked ? (
-                <div className="h-full flex flex-col items-center justify-center text-center animate-in fade-in duration-500 py-12">
+                <div className="h-full flex flex-col items-center justify-center text-center animate-in fade-in duration-500 w-full">
                    <div className="w-16 h-16 bg-green-100 text-green-800 rounded-full flex items-center justify-center mb-6">
                       <Check className="w-8 h-8" />
                    </div>
-                   <h3 className="font-serif text-3xl text-ink mb-4">Booking Confirmed</h3>
-                   <p className="text-ink-muted mb-2">
-                      You are scheduled for <strong>{selectedDate?.toLocaleDateString()}</strong> at <strong>{selectedTime}</strong>.
+                   <h3 className="font-serif text-3xl text-ink mb-3">Booking Confirmed</h3>
+                   <p className="text-ink-muted mb-1">
+                      {selectedDate?.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                    </p>
-                   <p className="text-sm text-ink-muted/70 mb-8">A calendar invitation has been sent to your email.</p>
-                   <Button variant="secondary" onClick={resetBooking}>Book Another</Button>
+                   <p className="text-xl text-ink font-serif mb-8">at {selectedTime}</p>
+                   <Button variant="secondary" onClick={resetBooking} className="text-sm px-6 py-3">Book Another</Button>
                 </div>
              ) : (
-               <div className="max-w-[320px] mx-auto w-full h-full flex flex-col justify-center">
+               <div className="w-full max-w-[360px]">
                  {view === 'calendar' ? (
                     <div className="animate-in slide-in-from-right-4 duration-300">
                        <div className="flex items-center justify-between mb-6">
-                          <button onClick={handlePrevMonth} className="p-1.5 hover:bg-ink/5 rounded-full transition-colors text-ink-muted">
-                             <ChevronLeft className="w-4 h-4" />
+                          <button onClick={handlePrevMonth} className="p-2 hover:bg-ink/5 rounded-full transition-colors text-ink-muted">
+                             <ChevronLeft className="w-5 h-5" />
                           </button>
-                          <h3 className="font-serif text-lg text-ink tracking-wide">
-                             {monthNames[currentDate.getMonth()]} <span className="text-ink-muted">{currentDate.getFullYear()}</span>
+                          <h3 className="font-serif text-lg text-ink tracking-wide font-medium">
+                             {monthNames[currentDate.getMonth()]} <span className="text-ink-muted ml-1">{currentDate.getFullYear()}</span>
                           </h3>
-                          <button onClick={handleNextMonth} className="p-1.5 hover:bg-ink/5 rounded-full transition-colors text-ink-muted">
-                             <ChevronRight className="w-4 h-4" />
+                          <button onClick={handleNextMonth} className="p-2 hover:bg-ink/5 rounded-full transition-colors text-ink-muted">
+                             <ChevronRight className="w-5 h-5" />
                           </button>
                        </div>
 
-                       <div className="grid grid-cols-7 gap-1 mb-2 text-center">
-                          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                             <div key={day} className="text-[9px] font-bold tracking-widest text-ink-muted/60 uppercase py-1">
+                       <div className="grid grid-cols-7 gap-2 mb-2 text-center">
+                          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
+                             <div key={day} className="text-[10px] font-bold text-ink-muted/60 uppercase tracking-wider">
                                 {day}
                              </div>
                           ))}
                        </div>
 
-                       <div className="grid grid-cols-7 gap-1 text-sm">
-                          {blanksArray.map((_, i) => <div key={`blank-${i}`} className="aspect-square" />)}
+                       <div className="grid grid-cols-7 gap-2 text-sm">
+                          {blanksArray.map((_, i) => <div key={`blank-${i}`} className="w-10 h-10" />)}
                           {daysArray.map(day => (
                              <button 
                                 key={day}
                                 onClick={() => handleDateClick(day)}
-                                className="aspect-square flex items-center justify-center text-ink hover:bg-accent hover:text-white rounded-sm transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-accent/50 text-xs font-medium"
+                                className="w-10 h-10 flex items-center justify-center text-ink hover:bg-accent hover:text-white rounded-sm transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-accent/50 text-sm font-medium"
                              >
                                 {day}
                              </button>
                           ))}
                        </div>
-
-                       <p className="mt-6 text-center text-[10px] text-ink-muted italic font-serif">
-                          Weekends reserved for study • Select a weekday
-                       </p>
                     </div>
                  ) : (
-                    <div className="h-full flex flex-col animate-in slide-in-from-right-4 duration-300">
-                       <button 
-                          onClick={() => setView('calendar')} 
-                          className="flex items-center text-xs font-bold text-ink-muted uppercase tracking-wider mb-4 hover:text-accent transition-colors self-start"
-                       >
-                          <ChevronLeft className="w-3 h-3 mr-1" /> Change Date
-                       </button>
-
-                       <div className="mb-6">
-                          <h3 className="font-serif text-xl text-ink mb-1">
-                             {selectedDate?.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
-                          </h3>
-                          <p className="text-xs text-ink-muted flex items-center gap-2">
-                            <Clock className="w-3 h-3" /> Select a time
-                          </p>
+                    <div className="w-full flex flex-col animate-in slide-in-from-right-4 duration-300">
+                       <div className="flex items-center justify-between mb-6">
+                         <button 
+                            onClick={() => setView('calendar')} 
+                            className="flex items-center text-xs font-bold text-ink-muted uppercase tracking-wider hover:text-accent transition-colors"
+                         >
+                            <ChevronLeft className="w-3 h-3 mr-1" /> Back
+                         </button>
+                         <h3 className="font-serif text-lg text-ink">
+                           {selectedDate?.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                         </h3>
                        </div>
 
-                       <div className="grid grid-cols-2 gap-3 mb-6">
+                       <div className="grid grid-cols-2 gap-3 mb-8">
                           {availableTimeSlots.map((time) => (
                              <button
                                 key={time}
                                 onClick={() => handleTimeSelect(time)}
-                                className={`py-2 px-4 border rounded-sm text-xs font-medium transition-all duration-200 ${
+                                className={`py-3 px-4 border rounded-sm text-sm font-medium transition-all duration-200 ${
                                    selectedTime === time 
-                                   ? 'bg-accent text-white border-accent shadow-md' 
+                                   ? 'bg-accent text-white border-accent shadow-md scale-[1.02]' 
                                    : 'bg-white border-ink/10 text-ink hover:border-accent/50 hover:shadow-sm'
                                 }`}
                              >
@@ -467,8 +426,8 @@ const BookingSection: React.FC = () => {
                        </div>
 
                        {selectedTime && (
-                          <div className="mt-auto border-t border-ink/10 pt-4 flex justify-end animate-in fade-in duration-300">
-                             <Button variant="primary" onClick={handleBooking} className="w-full text-xs py-2">Confirm</Button>
+                          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                             <Button variant="primary" onClick={handleBooking} className="w-full">Confirm Booking</Button>
                           </div>
                        )}
                     </div>
@@ -588,4 +547,189 @@ const DaVeenciLandingPage: React.FC = () => {
           </div>
           
           {/* System Diagram Visual Area */}
-          <div className="lg:col-span-6 relative h-[5
+          <div className="lg:col-span-6 relative h-[500px] flex items-center justify-center">
+            <HeroDiagram />
+          </div>
+        </div>
+      </Section>
+
+      {/* 2. Problems — Where Teams Get Stuck */}
+      <Section id="problems" pattern="grid" className="bg-white/40">
+        <SectionHeader 
+          eyebrow="Folio II — The Problem"
+          title="Where Teams Get Stuck"
+          subtitle="Most companies have 'AI Initiatives'. Few have shipped outcomes."
+        />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <Card title="The Pilot Purgatory" label="Symptom A">
+            <p>You have 12 distinct experiments running. None are production-grade. Your team is "learning" but not shipping.</p>
+          </Card>
+          <Card title="The Tool Fatigue" label="Symptom B">
+            <p>Subscriptions to ChatGPT Team, Claude, Jasper, and Copy.ai—yet work is still being done manually in spreadsheets.</p>
+          </Card>
+          <Card title="The Margin Squeeze" label="Symptom C">
+            <p>Revenue is growing, but headcount costs are growing faster. You need to break the linear relationship between growth and hiring.</p>
+          </Card>
+        </div>
+      </Section>
+
+      {/* 3. Solutions — What We Automate */}
+      <Section id="automation" pattern="nodes">
+        <SectionHeader 
+          eyebrow="Folio III — The Solution"
+          title="What We Automate"
+          subtitle="We don't just 'consult'. We map, build, and deploy."
+        />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="space-y-6">
+            <div className="group flex gap-6 p-6 border border-ink/5 bg-white/60 hover:border-accent/30 transition-all rounded-sm">
+               <div className="mt-1"><GitGraph className="w-6 h-6 text-accent" /></div>
+               <div>
+                 <h4 className="font-serif text-xl text-ink mb-2">Sales & Pipeline Ops</h4>
+                 <p className="text-ink-muted text-sm">Automated lead enrichment, personalized outreach generation, and CRM hygiene. Turn SDR work into an automated flow.</p>
+               </div>
+            </div>
+            <div className="group flex gap-6 p-6 border border-ink/5 bg-white/60 hover:border-accent/30 transition-all rounded-sm">
+               <div className="mt-1"><Zap className="w-6 h-6 text-accent" /></div>
+               <div>
+                 <h4 className="font-serif text-xl text-ink mb-2">Customer Success</h4>
+                 <p className="text-ink-muted text-sm">Ticket triage, auto-drafting responses for Tier 1 support, and customer sentiment analysis reports delivered to Slack.</p>
+               </div>
+            </div>
+            <div className="group flex gap-6 p-6 border border-ink/5 bg-white/60 hover:border-accent/30 transition-all rounded-sm">
+               <div className="mt-1"><Settings className="w-6 h-6 text-accent" /></div>
+               <div>
+                 <h4 className="font-serif text-xl text-ink mb-2">Content & Marketing Engine</h4>
+                 <p className="text-ink-muted text-sm">Transforming one webinar into blog posts, LinkedIn threads, and newsletter snippets automatically.</p>
+               </div>
+            </div>
+          </div>
+          <div className="relative flex items-center justify-center bg-ink/5 rounded-sm p-12">
+            <div className="text-center">
+              <div className="inline-flex p-4 border-2 border-dashed border-ink/20 rounded-full mb-6">
+                 <Cpu className="w-12 h-12 text-ink-muted" />
+              </div>
+              <h3 className="font-serif text-2xl text-ink mb-2">The DaVeenci Engine</h3>
+              <p className="text-ink-muted max-w-xs mx-auto text-sm">
+                Custom workflows built on n8n, Make, and Python scripts, seamlessly integrated into your existing stack.
+              </p>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      {/* 4. Services & Pricing */}
+      <Section id="services" pattern="grid" className="bg-ink text-base">
+        <div className="relative z-10">
+          <SectionHeader 
+            eyebrow="Folio IV — Engagement"
+            title="How We Partner"
+            subtitle="Simple, transparent engagement models. No hourly billing, just outcomes."
+            className="text-base [&_*]:text-base [&_p]:text-base/70 [&_span]:bg-white/10 [&_span]:text-base/90"
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+             {/* Card 1 */}
+             <div className="bg-ink-muted/30 border border-white/10 p-8 rounded-sm flex flex-col">
+                <div className="mb-6">
+                  <span className="text-accent font-bold tracking-wider text-xs uppercase">Audit</span>
+                  <h3 className="font-serif text-3xl text-base mt-2">The Blueprint</h3>
+                </div>
+                <ul className="space-y-4 text-base/70 text-sm mb-8 flex-1">
+                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> Workflow Mapping</li>
+                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> Tool Stack Audit</li>
+                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> ROI Calculator</li>
+                </ul>
+                <Button variant="secondary" className="w-full text-base border-white/20 hover:bg-white/10 hover:text-white" onClick={scrollToBooking}>Book Audit</Button>
+             </div>
+
+             {/* Card 2 - Highlighted */}
+             <div className="bg-base text-ink p-8 rounded-sm flex flex-col transform md:-translate-y-4 shadow-xl relative">
+                <div className="absolute top-0 right-0 bg-accent text-white text-xs font-bold px-3 py-1 rounded-bl-sm uppercase tracking-wide">Popular</div>
+                <div className="mb-6">
+                  <span className="text-accent font-bold tracking-wider text-xs uppercase">Build</span>
+                  <h3 className="font-serif text-3xl text-ink mt-2">The Workshop</h3>
+                </div>
+                <ul className="space-y-4 text-ink-muted text-sm mb-8 flex-1">
+                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> 3 Custom Automations</li>
+                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> Team Training Session</li>
+                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> 30 Days of Support</li>
+                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> Prompt Library</li>
+                </ul>
+                <Button variant="primary" className="w-full" onClick={scrollToBooking}>Start Build</Button>
+             </div>
+
+             {/* Card 3 */}
+             <div className="bg-ink-muted/30 border border-white/10 p-8 rounded-sm flex flex-col">
+                <div className="mb-6">
+                  <span className="text-accent font-bold tracking-wider text-xs uppercase">Scale</span>
+                  <h3 className="font-serif text-3xl text-base mt-2">Fractional CAIO</h3>
+                </div>
+                <ul className="space-y-4 text-base/70 text-sm mb-8 flex-1">
+                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> Ongoing Optimization</li>
+                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> Weekly Strategy Calls</li>
+                  <li className="flex gap-3"><Check className="w-4 h-4 text-accent" /> Vendor Management</li>
+                </ul>
+                <Button variant="secondary" className="w-full text-base border-white/20 hover:bg-white/10 hover:text-white" onClick={scrollToBooking}>Contact Us</Button>
+             </div>
+          </div>
+        </div>
+      </Section>
+
+      {/* 5. About — The Philosophy */}
+      <Section id="about" pattern="circles">
+         <div className="max-w-4xl mx-auto text-center">
+            <Logo className="w-16 h-16 text-ink mx-auto mb-8" />
+            <h2 className="font-serif text-4xl md:text-5xl text-ink mb-8 leading-tight">
+               "Simplicity is the ultimate sophistication."
+            </h2>
+            <p className="text-ink-muted text-lg md:text-xl leading-relaxed mb-8">
+               DaVeenci isn't about using the flashiest new model. It's about the engineering of elegance. We believe that the best automation is the one you don't notice—it just works, silently compounding your leverage every single day.
+            </p>
+            <div className="w-24 h-1 bg-accent mx-auto opacity-50"></div>
+         </div>
+      </Section>
+
+      {/* 6. Booking Section (Updated) */}
+      <BookingSection />
+
+      {/* 7. Newsletter */}
+      <Section id="newsletter" className="bg-white/50">
+         <div className="max-w-xl mx-auto text-center">
+            <Mail className="w-8 h-8 text-ink mx-auto mb-4" />
+            <h3 className="font-serif text-2xl text-ink mb-4">The DaVeenci Codex</h3>
+            <p className="text-ink-muted mb-8">Join 2,000+ operators receiving one high-leverage automation play every Tuesday.</p>
+            <div className="flex gap-2">
+               <input 
+                 type="email" 
+                 placeholder="Enter your email" 
+                 className="flex-1 bg-base border border-ink/10 px-4 py-3 rounded-sm text-ink placeholder:text-ink-muted/50 focus:outline-none focus:border-accent"
+               />
+               <Button variant="primary">Subscribe</Button>
+            </div>
+         </div>
+      </Section>
+
+      {/* 8. Footer */}
+      <footer className="bg-ink text-base py-12 border-t border-white/10">
+         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
+               <Logo className="w-6 h-6" />
+               <span className="font-serif text-lg font-bold">DaVeenci</span>
+            </div>
+            <div className="text-sm text-base/50">
+               © {new Date().getFullYear()} DaVeenci Consulting. All rights reserved.
+            </div>
+            <div className="flex gap-6 text-sm text-base/70">
+               <a href="#" className="hover:text-white transition-colors">Twitter</a>
+               <a href="#" className="hover:text-white transition-colors">LinkedIn</a>
+               <a href="#" className="hover:text-white transition-colors">Email</a>
+            </div>
+         </div>
+      </footer>
+
+    </div>
+  );
+};
+
+export default DaVeenciLandingPage;
