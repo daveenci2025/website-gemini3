@@ -100,26 +100,21 @@ export const NodeNetworkBackground: React.FC<{ className?: string }> = ({ classN
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    
+    // The container is the div wrapper which is absolutely positioned to fill the section
+    const container = canvas.parentElement; 
 
     let animationFrameId: number;
     let particles: { x: number; y: number; vx: number; vy: number }[] = [];
-    const connectionDistance = 200;
-
-    const resize = () => {
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      ctx.scale(dpr, dpr);
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
-      initParticles();
-    };
+    const connectionDistance = 400;
+    
+    let width = 0;
+    let height = 0;
 
     const initParticles = () => {
       particles = [];
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      const particleCount = Math.floor((width * height) / 50000); 
+      // Calculate particle count based on area to maintain consistent density
+      const particleCount = Math.floor((width * height) / 40000); 
 
       for (let i = 0; i < particleCount; i++) {
         particles.push({
@@ -131,19 +126,34 @@ export const NodeNetworkBackground: React.FC<{ className?: string }> = ({ classN
       }
     };
 
+    const resize = () => {
+      if (!container) return;
+      width = container.clientWidth;
+      height = container.clientHeight;
+      
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      
+      initParticles();
+    };
+
     const animate = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
       ctx.clearRect(0, 0, width, height);
       
       particles.forEach((p, i) => {
         p.x += p.vx;
         p.y += p.vy;
+        
+        // Bounce off walls
         if (p.x < 0 || p.x > width) p.vx *= -1;
         if (p.y < 0 || p.y > height) p.vy *= -1;
 
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
         ctx.fillStyle = '#222222'; 
         ctx.fill();
 
@@ -156,7 +166,7 @@ export const NodeNetworkBackground: React.FC<{ className?: string }> = ({ classN
           if (distance < connectionDistance) {
             ctx.beginPath();
             ctx.strokeStyle = `rgba(34, 34, 34, ${(1 - distance / connectionDistance) * 0.5})`; 
-            ctx.lineWidth = 0.8;
+            ctx.lineWidth = 1.2;
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
@@ -166,12 +176,16 @@ export const NodeNetworkBackground: React.FC<{ className?: string }> = ({ classN
       animationFrameId = requestAnimationFrame(animate);
     };
 
-    window.addEventListener('resize', resize);
+    // Use ResizeObserver to handle container size changes (e.g. content loading)
+    const resizeObserver = new ResizeObserver(() => resize());
+    if (container) resizeObserver.observe(container);
+    
+    // Initial call
     resize();
     animate();
 
     return () => {
-      window.removeEventListener('resize', resize);
+      resizeObserver.disconnect();
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
