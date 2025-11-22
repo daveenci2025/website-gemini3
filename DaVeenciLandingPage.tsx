@@ -21,6 +21,7 @@ interface SectionProps {
   className?: string;
   children: React.ReactNode;
   pattern?: 'none' | 'grid' | 'circles' | 'nodes';
+  overflow?: boolean;
 }
 
 interface EventCardProps {
@@ -325,22 +326,22 @@ const BriefingCard: React.FC<{
   issueNo: string;
   category: string;
 }> = ({ title, description, image, issueNo, category }) => (
-  <div className="group relative flex flex-col h-full bg-white border border-ink/10 rounded-sm overflow-hidden transition-all duration-500 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] hover:-translate-y-2">
+  <div className="group relative flex flex-col h-full bg-white border border-ink/10 rounded-sm overflow-hidden transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(63,132,200,0.15)] hover:-translate-y-3 hover:border-accent/30">
     {/* Accent Top Bar */}
     <div className="absolute top-0 inset-x-0 h-1 bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left z-30"></div>
 
     {/* Image Section */}
-    <div className="relative h-56 overflow-hidden">
+    <div className="relative h-60 overflow-hidden">
        <div className="absolute inset-0 bg-ink/20 mix-blend-multiply z-10 group-hover:opacity-0 transition-opacity duration-500"></div>
        <img 
          src={image} 
          alt={title} 
-         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out filter grayscale-[0.3] contrast-[1.05] group-hover:grayscale-0 group-hover:contrast-100" 
+         className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out filter grayscale-[0.2] contrast-[1.05] group-hover:grayscale-0 group-hover:contrast-100" 
        />
        
        {/* Category Tag - Now floating */}
        <div className="absolute top-4 left-4 z-20">
-          <span className="bg-white/95 backdrop-blur shadow-sm text-[10px] font-bold text-ink tracking-widest uppercase px-3 py-1.5 rounded-sm border border-ink/5 group-hover:text-accent transition-colors">
+          <span className="bg-white/95 backdrop-blur shadow-sm text-[10px] font-bold text-ink tracking-widest uppercase px-3 py-1.5 rounded-sm border border-ink/5 group-hover:text-accent group-hover:border-accent/20 transition-colors">
             {category}
           </span>
        </div>
@@ -436,8 +437,8 @@ const Card: React.FC<CardProps> = ({ title, children, label, className = '' }) =
   </div>
 );
 
-const Section: React.FC<SectionProps> = ({ id, className = '', children, pattern = 'none' }) => (
-  <section id={id} className={`relative py-20 md:py-28 px-6 overflow-hidden ${className}`}>
+const Section: React.FC<SectionProps> = ({ id, className = '', children, pattern = 'none', overflow = false }) => (
+  <section id={id} className={`relative py-20 md:py-28 px-6 ${overflow ? 'overflow-visible' : 'overflow-hidden'} ${className}`}>
     {pattern === 'grid' && <GridPattern />}
     {pattern === 'circles' && <VitruvianBackground />}
     {pattern === 'nodes' && <NodeNetworkBackground />}
@@ -509,16 +510,16 @@ const BookingSection: React.FC = () => {
   ];
 
   return (
-    <Section id="booking" className="bg-alt/20 border-t border-ink/5">
+    <Section id="booking" className="bg-alt/20 border-t border-ink/5" overflow={true}>
        <div className="mb-12 text-center">
           <h2 className="font-serif text-4xl md:text-5xl text-ink mb-4">Select Date & Time</h2>
           <p className="text-ink-muted">Secure your spot for a Fit Check.</p>
        </div>
 
        {/* Wider container: max-w-5xl for a better aspect ratio */}
-       <div className="max-w-5xl mx-auto bg-base shadow-2xl shadow-ink/10 border border-ink/10 rounded-sm overflow-hidden flex flex-col md:flex-row min-h-[480px]">
+       <div className="max-w-5xl mx-auto bg-base shadow-[0_20px_50px_-10px_rgba(0,0,0,0.1)] hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.15)] border border-ink/10 rounded-sm overflow-hidden flex flex-col md:flex-row min-h-[480px] transition-shadow duration-500">
           {/* Left Panel: Service Details */}
-          <div className="w-full md:w-5/12 p-8 md:p-10 border-r border-ink/10 bg-base relative flex flex-col justify-between">
+          <div className="w-full md:w-5/12 p-8 md:p-10 border-r border-ink/10 bg-base relative flex flex-col justify-between z-10">
              <div>
                 <div className="w-12 h-12 bg-ink text-base flex items-center justify-center rounded-sm mb-8 shadow-md">
                    <CalendarIcon className="w-6 h-6" />
@@ -545,7 +546,7 @@ const BookingSection: React.FC = () => {
           </div>
 
           {/* Right Panel: Calendar & Time */}
-          <div className="w-full md:w-7/12 p-8 md:p-12 bg-[#F9F7F2] relative flex flex-col items-center justify-center">
+          <div className="w-full md:w-7/12 p-8 md:p-12 bg-white relative flex flex-col items-center justify-center z-10">
              
              {booked ? (
                 <div className="h-full flex flex-col items-center justify-center text-center animate-in fade-in duration-500 w-full">
@@ -589,7 +590,7 @@ const BookingSection: React.FC = () => {
                              <button 
                                 key={day}
                                 onClick={() => handleDateClick(day)}
-                                className="w-10 h-10 flex items-center justify-center text-ink hover:bg-accent hover:text-white rounded-sm transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-accent/50 text-sm font-medium"
+                                className="w-10 h-10 flex items-center justify-center text-ink hover:bg-accent hover:text-white hover:shadow-lg hover:scale-110 rounded-sm transition-all duration-200 focus:outline-none text-sm font-medium"
                              >
                                 {day}
                              </button>
@@ -617,8 +618,8 @@ const BookingSection: React.FC = () => {
                                 onClick={() => handleTimeSelect(time)}
                                 className={`py-3 px-4 border rounded-sm text-sm font-medium transition-all duration-200 ${
                                    selectedTime === time 
-                                   ? 'bg-accent text-white border-accent shadow-md scale-[1.02]' 
-                                   : 'bg-white border-ink/10 text-ink hover:border-accent/50 hover:shadow-sm'
+                                   ? 'bg-accent text-white border-accent shadow-xl scale-105' 
+                                   : 'bg-white border-ink/10 text-ink hover:border-accent hover:text-accent hover:shadow-md hover:-translate-y-0.5'
                                 }`}
                              >
                                 {time}
@@ -920,7 +921,7 @@ const DaVeenciLandingPage: React.FC = () => {
       <BookingSection />
 
       {/* 7. Newsletter / Featured Briefings */}
-      <Section id="newsletter" pattern="nodes" className="bg-gradient-to-b from-base to-white relative overflow-visible">
+      <Section id="newsletter" pattern="nodes" className="bg-gradient-to-b from-base to-white relative overflow-visible" overflow={true}>
          {/* Background Decor */}
          <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-alt/10 to-transparent pointer-events-none"></div>
          
