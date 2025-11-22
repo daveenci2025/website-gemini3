@@ -109,18 +109,18 @@ const HeroDiagram: React.FC = () => (
     <div className="relative h-full w-full">
         <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 300 250" fill="none">
            
-           {/* Paths - Darkened to stroke-ink/20 (approx #C4B59D/grayish) for visibility on white */}
+           {/* Paths - Thinner lines (1.5) for elegance */}
            {/* Path 1: Input to Top Branch */}
-           <path d="M 30 125 C 60 125, 100 50, 150 50 C 200 50, 220 30, 240 30" stroke="#C4B59D" strokeWidth="2" fill="none" />
+           <path d="M 30 125 C 60 125, 100 50, 150 50 C 200 50, 220 30, 240 30" stroke="#C4B59D" strokeWidth="1.5" fill="none" />
            
            {/* Path 2: Input to Bottom Branch */}
-           <path d="M 30 125 C 60 125, 100 200, 150 200 C 200 200, 240 230, 270 230" stroke="#C4B59D" strokeWidth="2" fill="none" />
+           <path d="M 30 125 C 60 125, 100 200, 150 200 C 200 200, 240 230, 270 230" stroke="#C4B59D" strokeWidth="1.5" fill="none" />
            
            {/* Main Path: Input to Output (Blue Active) */}
-           <path d="M 30 125 L 270 125" stroke="#3f84c8" strokeWidth="2" className="animate-pulse" />
+           <path d="M 30 125 L 270 125" stroke="#3f84c8" strokeWidth="1.5" className="animate-pulse" />
 
            {/* Dashed Vertical Line */}
-           <line x1="150" y1="50" x2="150" y2="200" stroke="#C4B59D" strokeWidth="2" strokeDasharray="4 4" />
+           <line x1="150" y1="50" x2="150" y2="200" stroke="#C4B59D" strokeWidth="1.5" strokeDasharray="4 4" />
 
            {/* Input Node */}
            <circle cx="30" cy="125" r="6" fill="#222" />
@@ -131,13 +131,13 @@ const HeroDiagram: React.FC = () => (
            <circle cx="150" cy="125" r="30" fill="#3f84c8" fillOpacity="0.1" stroke="#3f84c8" strokeWidth="1" className="animate-spin-slow origin-[150px_125px]" strokeDasharray="4 2" />
            {/* Inner solid */}
            <circle cx="150" cy="125" r="4" fill="#3f84c8" />
-           <text x="150" y="175" textAnchor="middle" fontSize="10" fontWeight="bold" fill="#3f84c8" fontFamily="monospace" letterSpacing="0.05em">PROCESSING</text>
+           <text x="150" y="175" textAnchor="middle" fontSize="10" fontWeight="500" fill="#3f84c8" fontFamily="monospace" letterSpacing="0.05em">PROCESSING</text>
 
            {/* Top Node */}
-           <circle cx="150" cy="50" r="5" fill="white" stroke="#222" strokeWidth="2" />
+           <circle cx="150" cy="50" r="5" fill="white" stroke="#222" strokeWidth="1.5" />
 
            {/* Bottom Node */}
-           <circle cx="150" cy="200" r="5" fill="white" stroke="#222" strokeWidth="2" />
+           <circle cx="150" cy="200" r="5" fill="white" stroke="#222" strokeWidth="1.5" />
 
            {/* Output Node Main */}
            <rect x="260" y="115" width="20" height="20" rx="2" fill="#3f84c8" />
@@ -147,19 +147,17 @@ const HeroDiagram: React.FC = () => (
            <rect x="265" y="220" width="16" height="16" rx="2" fill="#222" />
         </svg>
 
-        {/* Floating Cards Overlay */}
-        {/* Updated background to bg-base (parchment) to stand out against the bg-white card */}
-        
+        {/* Floating Cards Overlay - Lighter font weights */}
         {/* Efficiency Card */}
         <div className="absolute top-4 right-0 bg-base shadow-lg border border-ink/10 px-4 py-2 rounded flex items-center gap-3 animate-float">
            <Activity className="w-4 h-4 text-ink-muted" />
-           <span className="text-xs font-bold text-ink">Efficiency +40%</span>
+           <span className="text-xs font-medium text-ink">Efficiency +40%</span>
         </div>
 
         {/* Automated Card */}
         <div className="absolute bottom-12 left-8 bg-base shadow-lg border border-ink/10 px-4 py-2 rounded flex items-center gap-3 animate-float-delayed">
            <Cpu className="w-4 h-4 text-accent" />
-           <span className="text-xs font-bold text-ink">Automated</span>
+           <span className="text-xs font-medium text-ink">Automated</span>
         </div>
 
     </div>
