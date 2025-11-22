@@ -273,8 +273,8 @@ const CodexEventCard: React.FC<EventCardProps & { index: number }> = ({ image, d
       {/* Header: Identifier */}
       <div className="flex justify-between items-end mb-6 border-b border-ink/10 pb-3 border-dashed">
          <div className="flex flex-col">
-            <span className="font-serif text-[10px] italic text-ink/40 mb-1">Codex Atlanticus</span>
-            <span className="font-mono text-xs font-bold tracking-widest text-ink/60 uppercase">Folio {100 + index}.v2</span>
+            <span className="font-serif text-[10px] italic text-ink/40 mb-1">Codex DaVeenci</span>
+            <span className="font-script text-xl text-ink/60 -rotate-1 transform origin-left">Folio {100 + index}.v2</span>
          </div>
          <div className="font-sans text-[10px] font-medium text-accent uppercase tracking-wider px-2 py-1 bg-accent/5 rounded-sm">
             Upcoming
@@ -345,7 +345,7 @@ const Button: React.FC<{
 
 const SectionHeader: React.FC<{ eyebrow: string; title: string; subtitle?: string; className?: string }> = ({ eyebrow, title, subtitle, className }) => (
   <div className={`mb-12 md:mb-16 ${className}`}>
-    <span className="inline-block py-1 px-3 mb-4 border border-ink/10 rounded-full text-xs font-semibold tracking-widest text-ink-muted uppercase bg-white/50 backdrop-blur-sm">
+    <span className="block font-script text-2xl text-ink-muted/80 mb-2 transform -rotate-1 origin-bottom-left">
       {eyebrow}
     </span>
     <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-ink mb-6 leading-tight">
@@ -671,7 +671,9 @@ const DaVeenciLandingPage: React.FC = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           <div className="lg:col-span-6 relative z-20">
-            <span className="inline-block mb-6 text-xs font-bold tracking-[0.2em] text-accent uppercase">Folio I — The Thesis</span>
+            <span className="block mb-4 font-script text-2xl text-accent -rotate-2 origin-bottom-left">
+              Folio I — The Thesis
+            </span>
             <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-ink leading-[1.1] mb-8">
               Clarity on AI.<br />
               <span className="italic text-ink-muted/80">Automation that Ships.</span>
