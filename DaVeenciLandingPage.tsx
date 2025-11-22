@@ -277,7 +277,7 @@ const BookingSection: React.FC = () => {
   const [booked, setBooked] = useState(false);
 
   const availableTimeSlots = [
-    "06:00 AM", "07:00 AM", "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM"
+    "07:00 AM", "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM"
   ];
 
   const getDaysInMonth = (date: Date) => {
@@ -334,9 +334,9 @@ const BookingSection: React.FC = () => {
           <p className="text-ink-muted">Secure your spot for a Fit Check.</p>
        </div>
 
-       <div className="max-w-5xl mx-auto bg-base shadow-2xl shadow-ink/10 border border-ink/10 rounded-sm overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+       <div className="max-w-4xl mx-auto bg-base shadow-2xl shadow-ink/10 border border-ink/10 rounded-sm overflow-hidden flex flex-col md:flex-row">
           {/* Left Panel: Service Details */}
-          <div className="w-full md:w-1/3 p-8 md:p-10 border-r border-ink/10 bg-base relative flex flex-col justify-between">
+          <div className="w-full md:w-5/12 p-6 md:p-8 border-r border-ink/10 bg-base relative flex flex-col justify-between">
              <div>
                 <div className="w-14 h-14 bg-ink text-base flex items-center justify-center rounded-sm mb-8 shadow-md">
                    <CalendarIcon className="w-7 h-7" />
@@ -377,10 +377,10 @@ const BookingSection: React.FC = () => {
           </div>
 
           {/* Right Panel: Calendar & Time */}
-          <div className="w-full md:w-2/3 p-8 md:p-10 bg-[#F9F7F2] relative">
+          <div className="w-full md:w-7/12 p-6 md:p-8 bg-[#F9F7F2] relative flex flex-col">
              
              {booked ? (
-                <div className="h-full flex flex-col items-center justify-center text-center animate-in fade-in duration-500">
+                <div className="h-full flex flex-col items-center justify-center text-center animate-in fade-in duration-500 py-12">
                    <div className="w-16 h-16 bg-green-100 text-green-800 rounded-full flex items-center justify-center mb-6">
                       <Check className="w-8 h-8" />
                    </div>
@@ -392,72 +392,72 @@ const BookingSection: React.FC = () => {
                    <Button variant="secondary" onClick={resetBooking}>Book Another</Button>
                 </div>
              ) : (
-               <>
+               <div className="max-w-[320px] mx-auto w-full h-full flex flex-col justify-center">
                  {view === 'calendar' ? (
                     <div className="animate-in slide-in-from-right-4 duration-300">
-                       <div className="flex items-center justify-between mb-8">
-                          <button onClick={handlePrevMonth} className="p-2 hover:bg-ink/5 rounded-full transition-colors text-ink-muted">
-                             <ChevronLeft className="w-5 h-5" />
+                       <div className="flex items-center justify-between mb-6">
+                          <button onClick={handlePrevMonth} className="p-1.5 hover:bg-ink/5 rounded-full transition-colors text-ink-muted">
+                             <ChevronLeft className="w-4 h-4" />
                           </button>
-                          <h3 className="font-serif text-xl text-ink tracking-wide">
+                          <h3 className="font-serif text-lg text-ink tracking-wide">
                              {monthNames[currentDate.getMonth()]} <span className="text-ink-muted">{currentDate.getFullYear()}</span>
                           </h3>
-                          <button onClick={handleNextMonth} className="p-2 hover:bg-ink/5 rounded-full transition-colors text-ink-muted">
-                             <ChevronRight className="w-5 h-5" />
+                          <button onClick={handleNextMonth} className="p-1.5 hover:bg-ink/5 rounded-full transition-colors text-ink-muted">
+                             <ChevronRight className="w-4 h-4" />
                           </button>
                        </div>
 
-                       <div className="grid grid-cols-7 gap-2 mb-2 text-center">
+                       <div className="grid grid-cols-7 gap-1 mb-2 text-center">
                           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                             <div key={day} className="text-[10px] font-bold tracking-widest text-ink-muted/60 uppercase py-2">
+                             <div key={day} className="text-[9px] font-bold tracking-widest text-ink-muted/60 uppercase py-1">
                                 {day}
                              </div>
                           ))}
                        </div>
 
-                       <div className="grid grid-cols-7 gap-2">
+                       <div className="grid grid-cols-7 gap-1 text-sm">
                           {blanksArray.map((_, i) => <div key={`blank-${i}`} className="aspect-square" />)}
                           {daysArray.map(day => (
                              <button 
                                 key={day}
                                 onClick={() => handleDateClick(day)}
-                                className="aspect-square flex items-center justify-center text-sm font-medium text-ink hover:bg-accent hover:text-white rounded-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/50"
+                                className="aspect-square flex items-center justify-center text-ink hover:bg-accent hover:text-white rounded-sm transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-accent/50 text-xs font-medium"
                              >
                                 {day}
                              </button>
                           ))}
                        </div>
 
-                       <p className="mt-8 text-center text-xs text-ink-muted italic font-serif">
-                          Weekends reserved for study • Select a weekday for audience
+                       <p className="mt-6 text-center text-[10px] text-ink-muted italic font-serif">
+                          Weekends reserved for study • Select a weekday
                        </p>
                     </div>
                  ) : (
                     <div className="h-full flex flex-col animate-in slide-in-from-right-4 duration-300">
                        <button 
                           onClick={() => setView('calendar')} 
-                          className="flex items-center text-xs font-bold text-ink-muted uppercase tracking-wider mb-6 hover:text-accent transition-colors self-start"
+                          className="flex items-center text-xs font-bold text-ink-muted uppercase tracking-wider mb-4 hover:text-accent transition-colors self-start"
                        >
-                          <ChevronLeft className="w-4 h-4 mr-1" /> Change Date
+                          <ChevronLeft className="w-3 h-3 mr-1" /> Change Date
                        </button>
 
-                       <div className="mb-8">
-                          <h3 className="font-serif text-2xl text-ink mb-1">
-                             {selectedDate?.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+                       <div className="mb-6">
+                          <h3 className="font-serif text-xl text-ink mb-1">
+                             {selectedDate?.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
                           </h3>
-                          <p className="text-sm text-ink-muted flex items-center gap-2">
-                            <Clock className="w-4 h-4" /> Select a time
+                          <p className="text-xs text-ink-muted flex items-center gap-2">
+                            <Clock className="w-3 h-3" /> Select a time
                           </p>
                        </div>
 
-                       <div className="grid grid-cols-2 gap-4 mb-8">
+                       <div className="grid grid-cols-2 gap-3 mb-6">
                           {availableTimeSlots.map((time) => (
                              <button
                                 key={time}
                                 onClick={() => handleTimeSelect(time)}
-                                className={`py-4 px-6 border rounded-sm text-sm font-medium transition-all duration-200 ${
+                                className={`py-2 px-4 border rounded-sm text-xs font-medium transition-all duration-200 ${
                                    selectedTime === time 
-                                   ? 'bg-accent text-white border-accent shadow-md scale-[1.02]' 
+                                   ? 'bg-accent text-white border-accent shadow-md' 
                                    : 'bg-white border-ink/10 text-ink hover:border-accent/50 hover:shadow-sm'
                                 }`}
                              >
@@ -467,13 +467,13 @@ const BookingSection: React.FC = () => {
                        </div>
 
                        {selectedTime && (
-                          <div className="mt-auto border-t border-ink/10 pt-6 flex justify-end animate-in fade-in duration-300">
-                             <Button variant="primary" onClick={handleBooking} className="w-full md:w-auto">Confirm Booking</Button>
+                          <div className="mt-auto border-t border-ink/10 pt-4 flex justify-end animate-in fade-in duration-300">
+                             <Button variant="primary" onClick={handleBooking} className="w-full text-xs py-2">Confirm</Button>
                           </div>
                        )}
                     </div>
                  )}
-               </>
+               </div>
              )}
           </div>
        </div>
@@ -588,342 +588,4 @@ const DaVeenciLandingPage: React.FC = () => {
           </div>
           
           {/* System Diagram Visual Area */}
-          <div className="lg:col-span-6 relative h-[500px] flex items-center justify-center hidden md:flex">
-             <HeroDiagram />
-          </div>
-        </div>
-      </Section>
-
-      {/* 2. Who We Design For */}
-      <Section className="bg-base border-t border-ink/5">
-        <SectionHeader 
-          eyebrow="Folio II — Who We Design For"
-          title="Built for people who move capital and companies."
-          subtitle="DaVeenci sits at the intersection of product, ops, and capital. We work best with leaders who care less about experiments and more about shipped systems."
-        />
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          <Card title="Founders & CEOs" label="Lead">
-            <p>Free your leadership team from manual coordination.</p>
-            <p>Scale ops, GTM, and reporting without hiring a small army.</p>
-            <p>Turn AI into a defensible edge, not a side project.</p>
-          </Card>
-          <Card title="VCs & Investors" label="Scale">
-            <p>Bring a practical AI playbook to your portfolio.</p>
-            <p>Identify where automation moves the P&L, not just the pitch deck.</p>
-            <p>Support founders with vetted patterns instead of vague advice.</p>
-          </Card>
-          <Card title="Business Owners" label="Operate">
-            <p>Remove busywork from finance, sales, and customer delivery.</p>
-            <p>Standardize processes before you scale them with AI.</p>
-            <p>Get clear ROI stories you can share with your board or partners.</p>
-          </Card>
-        </div>
-      </Section>
-
-      {/* 3. Where Teams Get Stuck */}
-      <Section id="problems" className="bg-alt/30" pattern="grid">
-        <SectionHeader 
-          eyebrow="Folio III — Where Teams Get Stuck"
-          title="The AI story sounds great. The implementation doesn’t."
-          subtitle="Most teams don’t fail because the tech isn’t good enough. They fail because nobody owns turning ideas into working systems."
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {[
-            {
-              title: "Too many ideas, no shipped systems",
-              text: "Everyone has a list of AI experiments. Few have a single critical workflow fully automated and measured."
-            },
-            {
-              title: "Fragmented tools, fragile glue",
-              text: "Zapier chains, scripts, and one-off dashboards break as soon as the business changes."
-            },
-            {
-              title: "No clear ROI narrative",
-              text: "Founders and investors can’t point to a clean “this workflow saved X hours and Y dollars,” so AI spending feels like a cost center."
-            },
-            {
-              title: "Ops bandwidth is the bottleneck",
-              text: "Your best operators are already underwater. They can’t design, test, and maintain automation on top of their day jobs."
-            }
-          ].map((item, i) => (
-             <div key={i} className="relative bg-base p-8 border-l-4 border-ink/20 hover:border-accent transition-colors shadow-sm group overflow-hidden">
-                {/* Faint graph pattern in bg */}
-                <div className="absolute right-0 bottom-0 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
-                  <svg width="120" height="80" viewBox="0 0 120 80" fill="none">
-                     <path d="M10 70 Q 40 10, 110 40" stroke="currentColor" strokeWidth="2" />
-                     <circle cx="10" cy="70" r="3" fill="currentColor" />
-                     <circle cx="110" cy="40" r="3" fill="currentColor" />
-                  </svg>
-                </div>
-                <h3 className="font-serif text-2xl text-ink mb-4">{item.title}</h3>
-                <p className="text-ink-muted leading-relaxed">{item.text}</p>
-             </div>
-          ))}
-        </div>
-      </Section>
-
-      {/* 4. What We Automate */}
-      <Section id="automation" className="bg-base">
-        <SectionHeader 
-          eyebrow="Folio IV — What We Automate"
-          title="We focus on workflows that move revenue, margin, or risk."
-          subtitle="We map your processes like Da Vinci’s sketches—then turn them into living systems."
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-ink/10 border border-ink/10 rounded-lg overflow-hidden">
-           {/* Using a grid gap for borders approach */}
-           {[
-             { title: "Revenue & GTM workflows", desc: "Lead routing, qualification, follow-ups, personalized outreach, renewal nudges." },
-             { title: "Founder & exec leverage", desc: "Briefing docs, investor updates, board prep, decision dashboards." },
-             { title: "Ops & delivery", desc: "Intake, triage, client onboarding, task routing, QA checks." },
-             { title: "Analytics & reporting", desc: "Automated metric collection, narrative summaries, weekly digests for leaders and investors." },
-             { title: "Knowledge & SOPs", desc: "Turning scattered docs into operational playbooks that bots and humans can both follow." },
-           ].map((card, idx) => (
-             <div key={idx} className="relative bg-base p-8 hover:bg-white/50 transition-colors group">
-               <div className="w-10 h-10 mb-4 border border-accent/30 rounded-full flex items-center justify-center text-accent group-hover:bg-accent group-hover:text-white transition-all">
-                  <ScrollIcon />
-               </div>
-               {/* Connecting line embellishment */}
-               <div className="absolute top-12 right-8 w-16 h-px bg-ink/10 group-hover:bg-accent/40 transition-colors"></div>
-               <div className="absolute top-12 right-8 w-1 h-1 bg-ink/20 rounded-full group-hover:bg-accent transition-colors"></div>
-
-               <h3 className="font-serif text-xl text-ink mb-3 font-semibold">{card.title}</h3>
-               <p className="text-sm text-ink-muted">{card.desc}</p>
-             </div>
-           ))}
-           
-           {/* CTA Tile */}
-           <div className="bg-base p-8 flex items-center justify-center hover:bg-white/50 transition-colors">
-              <a href="#services" className="group flex items-center text-accent font-semibold text-lg">
-                See examples
-                <ArrowRight className="ml-2 w-5 h-5 transform group-hover:translate-x-2 transition-transform"/>
-              </a>
-           </div>
-        </div>
-      </Section>
-
-      {/* 5. The DaVeenci Method */}
-      <Section id="method" pattern="circles">
-         <SectionHeader 
-          eyebrow="Folio V — The DaVeenci Method"
-          title="From napkin sketch to dependable system."
-          subtitle="We combine Da Vinci-style curiosity with operator-grade discipline. No labs, no theatrics—just workflows that ship."
-        />
-
-        <div className="relative mt-16">
-          {/* Connecting schematic process diagram */}
-          <ProcessDiagram />
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 relative z-10">
-             {[
-               { step: "01", title: "Diagnose the leverage points", desc: "We interview key stakeholders, map your core workflows, and quantify where automation would unlock the most time and margin." },
-               { step: "02", title: "Design & ship the first system", desc: "In a focused sprint, we design, prototype, and ship one high-leverage workflow—end-to-end, with owners, alerts, and guardrails." },
-               { step: "03", title: "Scale the blueprint", desc: "Once the first system works, we turn the blueprint into a reusable pattern for your next workflows or your entire portfolio." }
-             ].map((item, idx) => (
-               <div key={idx} className="flex flex-col items-start bg-base md:bg-transparent p-6 md:p-0 border border-ink/10 md:border-0 rounded-lg md:rounded-none backdrop-blur-sm md:backdrop-blur-none">
-                  <div className="w-12 h-12 bg-ink text-white rounded-full flex items-center justify-center font-serif font-bold text-xl mb-6 shadow-lg ring-4 ring-base relative">
-                    {item.step}
-                    {/* Little connector node below the circle */}
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-accent rounded-full"></div>
-                  </div>
-                  <h3 className="font-serif text-2xl text-ink mb-4">{item.title}</h3>
-                  <p className="text-ink-muted">{item.desc}</p>
-               </div>
-             ))}
-          </div>
-        </div>
-
-        <div className="mt-16 max-w-2xl mx-auto bg-white/60 border border-accent/20 p-6 rounded-lg flex gap-4 items-start relative overflow-hidden">
-          {/* Decorative bg grid */}
-          <div className="absolute inset-0 opacity-5 bg-[radial-gradient(#3f84c8_1px,transparent_1px)] [background-size:8px_8px]"></div>
-          
-          <div className="min-w-[4px] h-full bg-accent rounded-full self-stretch relative z-10"></div>
-          <div className="relative z-10">
-            <p className="text-sm font-bold text-accent mb-1 uppercase tracking-wider flex items-center gap-2">
-               <GitGraph className="w-4 h-4" />
-               For Investors
-            </p>
-            <p className="text-ink-muted italic">We can run this playbook for a single company or across a portfolio, creating repeatable patterns and shared learnings.</p>
-          </div>
-        </div>
-      </Section>
-
-      {/* 6. Services & Advisory */}
-      <Section id="services" className="bg-alt/30 border-t border-b border-ink/5">
-        <SectionHeader 
-          eyebrow="Folio VI — Services & Advisory"
-          title="Ways to work with DaVeenci."
-          subtitle="Whether you’re testing the waters or standardizing AI across a portfolio, we structure our work around clear outcomes."
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          
-          {/* Service 1 */}
-          <div className="bg-base p-8 flex flex-col border border-ink/10 hover:shadow-xl transition-shadow duration-300 group relative">
-             <SchematicDecor />
-             <div className="mb-6">
-               <h3 className="font-serif text-2xl text-ink mb-2">Automation Discovery Sprint</h3>
-               <span className="inline-block px-2 py-1 bg-ink/5 text-xs font-semibold text-ink-muted uppercase tracking-wide">2–3 Weeks</span>
-             </div>
-             <ul className="space-y-3 mb-8 flex-grow">
-               <li className="flex items-start text-sm text-ink-muted"><ChevronRight className="w-4 h-4 text-accent mt-1 mr-2 flex-shrink-0" /> Map priority workflows and failure modes.</li>
-               <li className="flex items-start text-sm text-ink-muted"><ChevronRight className="w-4 h-4 text-accent mt-1 mr-2 flex-shrink-0" /> Identify 2–3 high-ROI automation candidates.</li>
-               <li className="flex items-start text-sm text-ink-muted"><ChevronRight className="w-4 h-4 text-accent mt-1 mr-2 flex-shrink-0" /> Ship a clear roadmap + first implementation plan.</li>
-             </ul>
-             <div className="pt-6 border-t border-ink/10">
-               <p className="text-xs text-ink-muted italic">Best for founders and investors who want clarity before committing budget.</p>
-             </div>
-          </div>
-
-          {/* Service 2 */}
-          <div className="bg-base p-8 flex flex-col border-2 border-accent/20 relative shadow-lg transform md:-translate-y-4 group">
-             <SchematicDecor className="opacity-50" />
-             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-accent text-white text-xs font-bold px-3 py-1 uppercase tracking-wide rounded-full shadow-sm">Most Popular</div>
-             <div className="mb-6">
-               <h3 className="font-serif text-2xl text-ink mb-2">Embedded Automation Partner</h3>
-               <span className="inline-block px-2 py-1 bg-accent/10 text-xs font-semibold text-accent uppercase tracking-wide">Ongoing</span>
-             </div>
-             <ul className="space-y-3 mb-8 flex-grow">
-               <li className="flex items-start text-sm text-ink-muted"><ChevronRight className="w-4 h-4 text-accent mt-1 mr-2 flex-shrink-0" /> We act as your fractional AI/automation team.</li>
-               <li className="flex items-start text-sm text-ink-muted"><ChevronRight className="w-4 h-4 text-accent mt-1 mr-2 flex-shrink-0" /> Design, ship, and maintain critical workflows.</li>
-               <li className="flex items-start text-sm text-ink-muted"><ChevronRight className="w-4 h-4 text-accent mt-1 mr-2 flex-shrink-0" /> Monthly reporting on time saved, errors reduced, and ROI.</li>
-             </ul>
-             <div className="pt-6 border-t border-ink/10">
-               <p className="text-xs text-ink-muted italic">Best for teams without a dedicated automation function.</p>
-             </div>
-          </div>
-
-          {/* Service 3 */}
-          <div className="bg-base p-8 flex flex-col border border-ink/10 hover:shadow-xl transition-shadow duration-300 group relative">
-             <SchematicDecor />
-             <div className="mb-6">
-               <h3 className="font-serif text-2xl text-ink mb-2">Portfolio & Investor Advisory</h3>
-               <span className="inline-block px-2 py-1 bg-ink/5 text-xs font-semibold text-ink-muted uppercase tracking-wide">Retainer / Program</span>
-             </div>
-             <ul className="space-y-3 mb-8 flex-grow">
-               <li className="flex items-start text-sm text-ink-muted"><ChevronRight className="w-4 h-4 text-accent mt-1 mr-2 flex-shrink-0" /> Portfolio-wide AI & automation playbook.</li>
-               <li className="flex items-start text-sm text-ink-muted"><ChevronRight className="w-4 h-4 text-accent mt-1 mr-2 flex-shrink-0" /> Deep dives with selected companies.</li>
-               <li className="flex items-start text-sm text-ink-muted"><ChevronRight className="w-4 h-4 text-accent mt-1 mr-2 flex-shrink-0" /> Help with technical diligence on automation-heavy pitches.</li>
-             </ul>
-             <div className="pt-6 border-t border-ink/10">
-               <p className="text-xs text-ink-muted italic">Best for funds that want AI to show up in the numbers, not just the memos.</p>
-             </div>
-          </div>
-
-        </div>
-      </Section>
-
-      {/* 7. Why DaVeenci */}
-      <Section id="about" className="bg-base" pattern="nodes">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-           <div>
-             <span className="inline-block py-1 px-3 mb-4 border border-ink/10 rounded-full text-xs font-semibold tracking-widest text-ink-muted uppercase bg-white/50">Folio VII — Why DaVeenci</span>
-             <h2 className="font-serif text-4xl md:text-5xl text-ink mb-8">Inspired by Leonardo.<br/>Grounded in operating reality.</h2>
-             
-             <div className="prose prose-lg text-ink-muted font-sans">
-                <p className="mb-6">
-                  Leonardo sketched the future in his notebooks—machines, systems, and ideas far ahead of his time.
-                </p>
-                <p className="mb-6">
-                  DaVeenci takes the same spirit of curiosity and applies it to AI and automation, but with one constraint: everything we design has to work in the messy, human reality of your company.
-                </p>
-                <p>
-                  We bring a mix of product, engineering, and operations experience. That means we care as much about owners, edge cases, and adoption as we do about models and prompts.
-                </p>
-             </div>
-           </div>
-           
-           <div className="relative bg-white/40 p-8 border border-ink/10 rounded-lg backdrop-blur-sm">
-              <h3 className="font-serif text-xl text-ink mb-6">What clients value</h3>
-              <ul className="space-y-4">
-                 {[
-                   "We speak P&L, not just tokens and prompts.",
-                   "We design for maintainability, not heroics.",
-                   "We measure success in hours saved, errors avoided, and opportunities unlocked."
-                 ].map((item, i) => (
-                   <li key={i} className="flex items-center">
-                     <div className="w-8 h-px bg-accent mr-4"></div>
-                     <span className="text-ink font-medium">{item}</span>
-                   </li>
-                 ))}
-              </ul>
-              
-              {/* Decorative Signature-ish look */}
-              <div className="absolute bottom-4 right-8 opacity-20">
-                 <svg width="100" height="40" viewBox="0 0 100 40">
-                    <path d="M10,20 Q30,5 50,20 T90,20" fill="none" stroke="currentColor" strokeWidth="2" />
-                 </svg>
-              </div>
-           </div>
-        </div>
-      </Section>
-
-      {/* 8. Strong CTA Band - Replaced with Booking Section */}
-      {/* We are inserting the Booking Section here */}
-      
-      <BookingSection />
-
-      {/* 9. Automation Insider */}
-      <Section id="newsletter" className="bg-base" pattern="circles">
-        <div className="max-w-4xl mx-auto text-center">
-           <span className="text-accent font-bold uppercase tracking-widest text-xs mb-4 block">Folio VIII — Automation Insider</span>
-           <h2 className="font-serif text-3xl md:text-4xl text-ink mb-6">A short letter on practical AI, for people who sign checks.</h2>
-           <p className="text-ink-muted mb-10 max-w-2xl mx-auto">
-             A periodic note from DaVeenci on where AI automation is actually working—in the wild, with real numbers. No hype, no jargon, just patterns you can steal.
-           </p>
-
-           <div className="flex flex-col md:flex-row gap-6 justify-center text-left max-w-3xl mx-auto mb-12">
-             {[
-               "Concrete workflow examples from founders and operators.",
-               "Questions investors should ask about “AI-powered” startups.",
-               "Simple experiments you can run in your own company."
-             ].map((item, i) => (
-               <div key={i} className="flex items-start gap-3 md:w-1/3">
-                 <div className="mt-1 w-1.5 h-1.5 bg-accent rounded-full shrink-0" />
-                 <span className="text-sm text-ink-muted">{item}</span>
-               </div>
-             ))}
-           </div>
-
-           <div className="max-w-md mx-auto bg-white p-2 rounded border border-ink/20 flex shadow-sm">
-             <input 
-               type="email" 
-               placeholder="you@company.com" 
-               className="flex-grow px-4 py-2 bg-transparent outline-none text-ink placeholder:text-ink/30 font-sans"
-             />
-             <button className="bg-ink text-white px-6 py-2 font-medium text-sm hover:bg-accent transition-colors rounded-sm">
-               Get the Briefings
-             </button>
-           </div>
-        </div>
-      </Section>
-
-      {/* 10. Footer */}
-      <footer className="bg-base border-t border-ink/10 py-12 px-6">
-         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-3">
-               <Logo className="w-8 h-8 text-ink" />
-               <div className="flex flex-col">
-                  <span className="font-serif text-xl font-bold">DaVeenci</span>
-                  <span className="text-[0.5rem] tracking-widest text-ink-muted uppercase">The Art of Automation</span>
-               </div>
-            </div>
-
-            <div className="flex gap-8 text-sm text-ink-muted">
-               <a href="#" className="hover:text-accent">Privacy</a>
-               <a href="#" className="hover:text-accent">Contact</a>
-               <a href="#" className="hover:text-accent">LinkedIn</a>
-            </div>
-
-            <div className="text-xs text-ink-muted/60 uppercase tracking-widest">
-              Inspired by Leonardo. Built for modern teams.
-            </div>
-         </div>
-      </footer>
-    </div>
-  );
-};
-
-export default DaVeenciLandingPage;
+          <div className="lg:col-span-6 relative h-[5
