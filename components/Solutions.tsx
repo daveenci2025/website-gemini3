@@ -1,12 +1,16 @@
+
 import React from 'react';
-import { GitGraph, Settings, Cpu, Zap, MessageSquare } from 'lucide-react';
+import { GitGraph, Settings, Cpu, Zap, MessageSquare, Check, TrendingUp, Activity } from 'lucide-react';
 import { Section, SectionHeader, ScrollReveal } from './Shared';
 
 const CRMFlowDiagram: React.FC = () => (
-  <div className="relative w-full max-w-md lg:max-w-lg mx-auto aspect-[4/3] bg-white shadow-xl shadow-ink/10 rounded-sm border border-ink/10 p-8 rotate-[1deg] hover:rotate-0 transition-transform duration-500 ease-out">
-    <div className="flex justify-between items-center mb-6 border-b border-ink/10 pb-4">
-       <div className="font-serif text-lg text-ink italic">Pipeline Automation</div>
-       <div className="font-mono text-[9px] tracking-widest text-ink/30 uppercase">V 1.4</div>
+  <div className="relative w-full max-w-md lg:max-w-lg mx-auto aspect-[4/3] bg-white shadow-2xl shadow-ink/20 rounded-sm border border-ink/10 p-6 md:p-10 rotate-[1deg] hover:rotate-0 transition-transform duration-700 ease-out group">
+    <div className="flex justify-between items-center mb-8 border-b border-ink/10 pb-4">
+       <div className="flex gap-2">
+          <div className="w-3 h-3 rounded-full bg-ink/10"></div>
+          <div className="w-3 h-3 rounded-full bg-ink/10"></div>
+       </div>
+       <div className="font-mono text-[10px] tracking-[0.2em] text-ink/40 uppercase">Pipeline Automation v1.4</div>
     </div>
     <div className="relative h-full w-full">
       <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 300 180" fill="none">
@@ -31,19 +35,22 @@ const CRMFlowDiagram: React.FC = () => (
          <path d="M 252 47 L 252 47" stroke="#222" strokeWidth="4" strokeLinecap="round" />
       </svg>
 
-      <div className="absolute top-0 right-10 bg-[#f0fdf4] border border-green-100 shadow-sm px-3 py-1 rounded-sm flex items-center gap-2 animate-float">
-         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-         <span className="text-[10px] font-bold text-green-800 tracking-wide">QUALIFIED</span>
+      <div className="absolute top-0 right-0 bg-base shadow-lg border border-ink/10 px-4 py-2 rounded flex items-center gap-3 animate-float">
+         <Check className="w-4 h-4 text-green-600" />
+         <span className="text-xs font-medium text-ink">Qualified Lead</span>
       </div>
     </div>
   </div>
 );
 
 const MarketingEngineDiagram: React.FC = () => (
-  <div className="relative w-full max-w-md lg:max-w-lg mx-auto aspect-[4/3] bg-white shadow-xl shadow-ink/10 rounded-sm border border-ink/10 p-8 rotate-[-1deg] hover:rotate-0 transition-transform duration-500 ease-out">
-     <div className="flex justify-between items-center mb-6 border-b border-ink/10 pb-4">
-       <div className="font-serif text-lg text-ink italic">Content Multiplier</div>
-       <div className="font-mono text-[9px] tracking-widest text-ink/30 uppercase">ENG 2.0</div>
+  <div className="relative w-full max-w-md lg:max-w-lg mx-auto aspect-[4/3] bg-white shadow-2xl shadow-ink/20 rounded-sm border border-ink/10 p-6 md:p-10 rotate-[-1deg] hover:rotate-0 transition-transform duration-700 ease-out group">
+     <div className="flex justify-between items-center mb-8 border-b border-ink/10 pb-4">
+       <div className="flex gap-2">
+          <div className="w-3 h-3 rounded-full bg-ink/10"></div>
+          <div className="w-3 h-3 rounded-full bg-ink/10"></div>
+       </div>
+       <div className="font-mono text-[10px] tracking-[0.2em] text-ink/40 uppercase">Content Multiplier v2.0</div>
     </div>
     <div className="relative h-full w-full">
        <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 300 180" fill="none">
@@ -70,18 +77,22 @@ const MarketingEngineDiagram: React.FC = () => (
           <text x="245" y="85" textAnchor="middle" fontSize="9" fill="#3f84c8" fontFamily="monospace">REPURPOSED</text>
        </svg>
 
-       <div className="absolute top-4 left-4 bg-base shadow-sm border border-ink/10 px-3 py-1 rounded-sm animate-float-delayed">
-          <span className="text-[10px] font-bold text-ink-muted tracking-wide uppercase">4x Reach</span>
+       <div className="absolute top-4 left-0 bg-base shadow-lg border border-ink/10 px-4 py-2 rounded flex items-center gap-3 animate-float-delayed">
+          <TrendingUp className="w-4 h-4 text-ink-muted" />
+          <span className="text-xs font-medium text-ink">4x Reach</span>
        </div>
     </div>
   </div>
 );
 
 const OpsDiagram: React.FC = () => (
-  <div className="relative w-full max-w-md lg:max-w-lg mx-auto aspect-[4/3] bg-white shadow-xl shadow-ink/10 rounded-sm border border-ink/10 p-8 rotate-[1deg] hover:rotate-0 transition-transform duration-500 ease-out">
-    <div className="flex justify-between items-center mb-6 border-b border-ink/10 pb-4">
-       <div className="font-serif text-lg text-ink italic">Central Command</div>
-       <div className="font-mono text-[9px] tracking-widest text-ink/30 uppercase">OPS 3.0</div>
+  <div className="relative w-full max-w-md lg:max-w-lg mx-auto aspect-[4/3] bg-white shadow-2xl shadow-ink/20 rounded-sm border border-ink/10 p-6 md:p-10 rotate-[1deg] hover:rotate-0 transition-transform duration-700 ease-out group">
+    <div className="flex justify-between items-center mb-8 border-b border-ink/10 pb-4">
+       <div className="flex gap-2">
+          <div className="w-3 h-3 rounded-full bg-ink/10"></div>
+          <div className="w-3 h-3 rounded-full bg-ink/10"></div>
+       </div>
+       <div className="font-mono text-[10px] tracking-[0.2em] text-ink/40 uppercase">Central Command v3.0</div>
     </div>
     <div className="relative h-full w-full">
       <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 300 180" fill="none">
@@ -100,11 +111,11 @@ const OpsDiagram: React.FC = () => (
              <line x1="42" y1="10" x2="100" y2="-15" stroke="#C4B59D" strokeWidth="1.5" strokeDasharray="3 3" />
          </g>
 
-         <path d="M 175 90 L 240 50" stroke="#3f84c8" strokeWidth="1.5" />
+         <path d="M 175 90 L 240 35" stroke="#3f84c8" strokeWidth="1.5" />
          <path d="M 175 90 L 240 90" stroke="#3f84c8" strokeWidth="1.5" />
-         <path d="M 175 90 L 240 130" stroke="#3f84c8" strokeWidth="1.5" />
+         <path d="M 175 90 L 240 145" stroke="#3f84c8" strokeWidth="1.5" />
 
-         <g transform="translate(245, 50)">
+         <g transform="translate(245, 35)">
            <circle cx="0" cy="0" r="15" fill="white" stroke="#3f84c8" strokeWidth="1.5" />
            <path d="M -5 -5 L 5 5" stroke="#3f84c8" strokeWidth="1.5" />
            <path d="M 5 -5 L -5 5" stroke="#3f84c8" strokeWidth="1.5" />
@@ -117,15 +128,16 @@ const OpsDiagram: React.FC = () => (
            <text x="0" y="25" textAnchor="middle" fontSize="8" fill="#3f84c8">DISPATCH</text>
          </g>
 
-         <g transform="translate(245, 130)">
+         <g transform="translate(245, 145)">
            <circle cx="0" cy="0" r="15" fill="white" stroke="#3f84c8" strokeWidth="1.5" />
            <path d="M -8 -5 h 16 v 10 h -16 z" stroke="#3f84c8" strokeWidth="1" fill="none"/>
            <text x="0" y="25" textAnchor="middle" fontSize="8" fill="#3f84c8">RECORD</text>
          </g>
       </svg>
       
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-ink text-white px-3 py-1 rounded-full text-[10px] font-mono tracking-widest shadow-lg animate-float">
-         ROUTING ACTIVE
+      <div className="absolute bottom-8 left-0 bg-base shadow-lg border border-ink/10 px-4 py-2 rounded flex items-center gap-3 animate-float">
+         <Activity className="w-4 h-4 text-accent" />
+         <span className="text-xs font-medium text-ink">Routing Active</span>
       </div>
     </div>
   </div>
