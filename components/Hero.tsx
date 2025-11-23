@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Cpu, Activity } from 'lucide-react';
 import { Section, ScrollReveal, Button, VitruvianBackground } from './Shared';
@@ -54,7 +55,7 @@ const Hero: React.FC = () => {
   };
 
   return (
-    <Section className="pt-40 pb-24 md:pt-48 md:pb-32 min-h-screen flex items-center">
+    <Section className="pt-44 pb-24 md:pt-52 md:pb-32 min-h-screen flex items-center">
       <VitruvianBackground className="opacity-[0.12] -right-1/4 scale-125" />
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
@@ -71,8 +72,8 @@ const Hero: React.FC = () => {
               DaVeenci helps founders, investors, and operators turn AI from slideware into shipped workflows—so teams can scale revenue and margin without scaling headcount.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <Button variant="primary" onClick={scrollToBooking}>Book a Strategy Session</Button>
-              <Button variant="secondary">See How We Work</Button>
+              <Button variant="primary" onClick={scrollToBooking} className="text-base px-8 py-4">Book a Strategy Session</Button>
+              <Button variant="secondary" className="text-base px-8 py-4">See How We Work</Button>
             </div>
             <p className="text-xs md:text-sm text-ink-muted/60 font-medium tracking-wide">
               Built for early-stage to growth companies in B2B SaaS, services, and tech-enabled businesses.
