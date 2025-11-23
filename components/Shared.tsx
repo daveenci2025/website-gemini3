@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 
 // --- Types & Interfaces ---
 
@@ -28,6 +28,16 @@ export interface EventCardProps {
   date: string;
   title: string;
   description: string;
+}
+
+export interface BriefingCardProps {
+  title: string;
+  description: string;
+  image: string;
+  issueNo: string;
+  category: string;
+  className?: string;
+  onClick?: () => void;
 }
 
 // --- Scroll Animation Hook & Component ---
@@ -101,7 +111,6 @@ export const NodeNetworkBackground: React.FC<{ className?: string }> = ({ classN
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    // The container is the div wrapper which is absolutely positioned to fill the section
     const container = canvas.parentElement; 
 
     let animationFrameId: number;
@@ -113,7 +122,6 @@ export const NodeNetworkBackground: React.FC<{ className?: string }> = ({ classN
 
     const initParticles = () => {
       particles = [];
-      // Calculate particle count based on area to maintain consistent density
       const particleCount = Math.floor((width * height) / 40000); 
 
       for (let i = 0; i < particleCount; i++) {
@@ -148,7 +156,6 @@ export const NodeNetworkBackground: React.FC<{ className?: string }> = ({ classN
         p.x += p.vx;
         p.y += p.vy;
         
-        // Bounce off walls
         if (p.x < 0 || p.x > width) p.vx *= -1;
         if (p.y < 0 || p.y > height) p.vy *= -1;
 
@@ -176,11 +183,9 @@ export const NodeNetworkBackground: React.FC<{ className?: string }> = ({ classN
       animationFrameId = requestAnimationFrame(animate);
     };
 
-    // Use ResizeObserver to handle container size changes (e.g. content loading)
     const resizeObserver = new ResizeObserver(() => resize());
     if (container) resizeObserver.observe(container);
     
-    // Initial call
     resize();
     animate();
 
@@ -277,7 +282,7 @@ export const SectionHeader: React.FC<{ eyebrow: string; title: string; subtitle?
 );
 
 export const Card: React.FC<CardProps> = ({ title, children, label, className = '' }) => (
-  <div className={`relative bg-base border border-ink/10 p-6 md:p-8 transition-all duration-300 hover:shadow-lg hover:border-accent/30 group ${className}`}>
+  <div className={`relative bg-white/40 backdrop-blur-sm border border-ink/10 p-6 md:p-8 transition-all duration-300 hover:shadow-xl hover:shadow-ink/5 hover:border-accent/30 hover:bg-white/60 group ${className}`}>
     <SchematicDecor className="opacity-0 group-hover:opacity-40 transition-opacity duration-500" />
     <div className="absolute top-0 left-0 w-0 h-0 border-t-[12px] border-l-[12px] border-transparent group-hover:border-accent transition-all duration-300"></div>
     {label && (
@@ -288,6 +293,53 @@ export const Card: React.FC<CardProps> = ({ title, children, label, className = 
     <h3 className="font-serif text-xl md:text-2xl text-ink mb-4">{title}</h3>
     <div className="font-sans text-ink-muted leading-relaxed space-y-2">
       {children}
+    </div>
+  </div>
+);
+
+export const BriefingCard: React.FC<BriefingCardProps> = ({ title, description, image, issueNo, category, className, onClick }) => (
+  <div onClick={onClick} className={`group relative flex flex-col h-full bg-white/40 backdrop-blur-md border border-ink/10 rounded-sm overflow-hidden transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(63,132,200,0.15)] hover:-translate-y-2 hover:border-accent/30 cursor-pointer ${className}`}>
+    <div className="absolute top-0 inset-x-0 h-1 bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left z-30"></div>
+
+    <div className="relative h-56 overflow-hidden">
+       <div className="absolute inset-0 bg-ink/20 mix-blend-multiply z-10 group-hover:opacity-0 transition-opacity duration-500"></div>
+       <img 
+         src={image} 
+         alt={title} 
+         className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out filter grayscale-[0.2] contrast-[1.05] group-hover:grayscale-0 group-hover:contrast-100" 
+       />
+       
+       <div className="absolute top-4 left-4 z-20">
+          <span className="bg-white/95 backdrop-blur shadow-sm text-[10px] font-bold text-ink tracking-widest uppercase px-3 py-1.5 rounded-sm border border-ink/5 group-hover:text-accent group-hover:border-accent/20 transition-colors">
+            {category}
+          </span>
+       </div>
+
+        <div className="absolute bottom-0 right-0 bg-white/90 backdrop-blur-md px-4 py-2 border-tl rounded-tl-sm border-ink/10 z-20 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+          <span className="font-mono text-[10px] font-bold text-ink-muted uppercase tracking-wider">No. {issueNo}</span>
+       </div>
+    </div>
+
+    <div className="p-8 flex flex-col flex-grow relative">
+       <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#222_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
+       
+       <h3 className="relative font-serif text-2xl text-ink mb-3 group-hover:text-accent transition-colors duration-300 leading-tight">
+          {title}
+       </h3>
+       
+       <div className="w-12 h-0.5 bg-ink/10 mb-4 group-hover:bg-accent/30 transition-colors duration-500"></div>
+
+       <p className="relative font-sans text-sm text-ink-muted leading-relaxed mb-8 flex-grow">
+         {description}
+       </p>
+
+       <div className="relative mt-auto flex items-center justify-between pt-6 border-t border-ink/5 group-hover:border-ink/10 transition-colors">
+          <span className="text-[10px] font-mono text-ink-muted/60 uppercase tracking-wider">Read Time: 4m</span>
+          <button className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-ink group-hover:text-accent transition-colors">
+             <span>Read Briefing</span>
+             <ArrowUpRight className="w-3 h-3 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </button>
+       </div>
     </div>
   </div>
 );

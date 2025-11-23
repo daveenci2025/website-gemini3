@@ -9,11 +9,16 @@ import Booking from './components/Booking';
 import Newsletter from './components/Newsletter';
 import Footer from './components/Footer';
 import { Section, ScrollReveal, Logo } from './components/Shared';
+import { Page } from './App';
 
-const DaVeenciLandingPage: React.FC = () => {
+interface DaVeenciLandingPageProps {
+  onNavigate: (page: Page, hash?: string, id?: string) => void;
+}
+
+const DaVeenciLandingPage: React.FC<DaVeenciLandingPageProps> = ({ onNavigate }) => {
   return (
     <div className="flex flex-col w-full overflow-x-hidden">
-      <Header />
+      <Header onNavigate={onNavigate} currentPage="landing" />
       
       <Hero />
 
@@ -40,7 +45,7 @@ const DaVeenciLandingPage: React.FC = () => {
 
       <Booking />
 
-      <Newsletter />
+      <Newsletter onNavigate={onNavigate} />
 
       <Footer />
     </div>
