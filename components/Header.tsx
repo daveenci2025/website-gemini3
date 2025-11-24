@@ -1,15 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { Menu, X, ArrowLeft } from 'lucide-react';
-import { Logo, Button, NavLink } from './Shared';
-import { Page } from '../App';
+import { Logo, Button } from './Shared';
+import type { Page, NavLink } from './types';
 
 interface HeaderProps {
   onNavigate?: (page: Page, hash?: string) => void;
   currentPage?: Page;
+  activeSection?: string | null;
 }
 
-const Header: React.FC<HeaderProps> = ({ onNavigate, currentPage = 'landing' }) => {
+const Header: React.FC<HeaderProps> = ({ onNavigate, currentPage = 'landing', activeSection }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -20,18 +21,31 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, currentPage = 'landing' }) 
   }, []);
 
   const navLinks: NavLink[] = [
+    { label: "Who We Are", href: "/who-we-are" },
     { label: "Where Teams Get Stuck", href: "#problems" },
     { label: "What We Automate", href: "#automation" },
-    { label: "Events", href: "#events" },
-    { label: "Briefings", href: "/briefings" },
+    { label: "Briefings & How-Tos", href: "/briefings" },
   ];
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
 
+  const isActive = (link: NavLink) => {
+    if (link.href === '/briefings' && (currentPage === 'briefings' || currentPage === 'briefing-detail')) return true;
+    if (link.href === '/who-we-are' && currentPage === 'who-we-are') return true;
+    if (link.href.startsWith('#') && currentPage === 'landing' && activeSection === link.href) return true;
+    return false;
+  };
+
   const handleNavClick = (e: React.MouseEvent, link: NavLink) => {
     e.preventDefault();
     closeMenu();
+
+    if (link.href === '/who-we-are') {
+      onNavigate?.('who-we-are');
+      window.scrollTo(0,0);
+      return;
+    }
 
     if (link.href === '/briefings') {
       onNavigate?.('briefings');
@@ -41,12 +55,9 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, currentPage = 'landing' }) 
 
     // Anchor links
     if (link.href.startsWith('#')) {
-      if (currentPage !== 'landing') {
-        onNavigate?.('landing', link.href);
-      } else {
-        const element = document.getElementById(link.href.substring(1));
-        element?.scrollIntoView({ behavior: 'smooth' });
-      }
+      // Always route through onNavigate to ensure App state (activeSection) updates correctly
+      // and scrolling is handled centrally, even if we are already on the landing page.
+      onNavigate?.('landing', link.href);
     }
   };
 
@@ -61,15 +72,11 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, currentPage = 'landing' }) 
 
   const scrollToBooking = () => {
     closeMenu();
-    if (currentPage !== 'landing') {
-      onNavigate?.('landing', '#booking');
-    } else {
-      document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' });
-    }
+    onNavigate?.('landing', '#booking');
   };
 
   return (
-    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#faf8f2]/90 backdrop-blur-md shadow-sm py-3 border-b border-ink/5' : 'bg-transparent py-6'}`}>
+    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/85 backdrop-blur-md shadow-sm py-3 border-b border-ink/5' : 'bg-transparent py-6'}`}>
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         
         {/* Logo or Back Button */}
@@ -77,7 +84,7 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, currentPage = 'landing' }) 
           {currentPage === 'briefing-detail' ? (
              <div onClick={(e) => { e.stopPropagation(); onNavigate?.('briefings'); }} className="flex items-center gap-2 text-ink-muted hover:text-accent transition-colors">
                 <ArrowLeft className="w-5 h-5" />
-                <span className="font-sans font-medium text-sm hidden md:block">Back to Briefings</span>
+                <span className="font-sans font-medium text-base hidden md:block">Back to Briefings & How-Tos</span>
              </div>
           ) : (
             <>
@@ -90,27 +97,30 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, currentPage = 'landing' }) 
           )}
         </div>
 
-        {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center space-x-10">
-          {navLinks.map((link) => (
-            <a 
-              key={link.label} 
-              href={link.href}
-              onClick={(e) => handleNavClick(e, link)}
-              className={`text-sm font-medium transition-colors relative group ${
-                (link.href === '/briefings' && (currentPage === 'briefings' || currentPage === 'briefing-detail')) ? 'text-accent' : 'text-ink-muted hover:text-accent'
-              }`}
-            >
-              {link.label}
-              <span className={`absolute -bottom-1 left-0 h-0.5 bg-accent transition-all duration-300 ${
-                 (link.href === '/briefings' && (currentPage === 'briefings' || currentPage === 'briefing-detail')) ? 'w-full' : 'w-0 group-hover:w-full'
-              }`}></span>
-            </a>
-          ))}
-          <Button variant="primary" className="py-2 px-5 text-sm shadow-md hover:shadow-lg" onClick={scrollToBooking}>Book a Call</Button>
+        {/* Desktop Nav - Visible on LG screens and up */}
+        <nav className="hidden lg:flex items-center space-x-4">
+          {navLinks.map((link) => {
+            const active = isActive(link);
+            return (
+              <a 
+                key={link.label} 
+                href={link.href}
+                onClick={(e) => handleNavClick(e, link)}
+                className={`text-base transition-colors relative group whitespace-nowrap px-2 py-1 ${
+                  active ? 'text-[#3f84c8] font-bold' : 'text-ink-muted hover:text-accent font-medium'
+                }`}
+              >
+                {link.label}
+                <span className={`absolute -bottom-1 left-0 h-0.5 bg-accent transition-all duration-300 ${
+                  active ? 'w-full' : 'w-0 group-hover:w-full'
+                }`}></span>
+              </a>
+            );
+          })}
+          <Button variant="primary" className="py-2 px-5 text-base shadow-md hover:shadow-lg whitespace-nowrap ml-2" onClick={scrollToBooking}>Book a Call</Button>
         </nav>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Button - Visible on screens smaller than LG */}
         <button onClick={toggleMenu} className="lg:hidden p-2 text-ink hover:text-accent transform transition-transform active:scale-95">
           {isMenuOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
         </button>
@@ -118,17 +128,22 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, currentPage = 'landing' }) 
 
       {/* Mobile Dropdown */}
       {isMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 w-full bg-base border-b border-ink/10 shadow-xl p-8 flex flex-col space-y-6 animate-in slide-in-from-top-4 duration-300 h-screen">
-          {navLinks.map((link) => (
-            <a 
-              key={link.label} 
-              href={link.href} 
-              onClick={(e) => handleNavClick(e, link)}
-              className="text-xl font-serif text-ink hover:text-accent border-b border-ink/5 pb-3 transition-colors"
-            >
-              {link.label}
-            </a>
-          ))}
+        <div className="lg:hidden absolute top-full left-0 w-full bg-base border-b border-ink/10 shadow-xl p-8 flex flex-col space-y-6 animate-in slide-in-from-top-4 duration-300 h-screen overflow-y-auto pb-32">
+          {navLinks.map((link) => {
+            const active = isActive(link);
+            return (
+              <a 
+                key={link.label} 
+                href={link.href} 
+                onClick={(e) => handleNavClick(e, link)}
+                className={`text-xl font-serif border-b border-ink/5 pb-3 transition-colors ${
+                  active ? 'text-[#3f84c8] font-bold' : 'text-ink hover:text-accent'
+                }`}
+              >
+                {link.label}
+              </a>
+            );
+          })}
           <Button variant="primary" className="w-full mt-4 py-4 text-base" onClick={scrollToBooking}>Book a Call</Button>
         </div>
       )}

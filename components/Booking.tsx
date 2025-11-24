@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Calendar as CalendarIcon, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Section, ScrollReveal, Button } from './Shared';
@@ -60,8 +61,8 @@ const Booking: React.FC = () => {
   ];
 
   return (
-    <Section id="booking" className="bg-alt/20 border-t border-ink/5" overflow={true}>
-       <div className="mb-12 text-center">
+    <Section className="bg-alt/20 border-t border-ink/5" overflow={true}>
+       <div id="booking" className="mb-12 text-center">
           <ScrollReveal>
             <h2 className="font-serif text-4xl md:text-5xl text-ink mb-4">Select Date & Time</h2>
             <p className="text-ink-muted">Secure your spot for a Fit Check.</p>

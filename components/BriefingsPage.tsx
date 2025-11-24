@@ -1,10 +1,10 @@
 
-import React, { useState } from 'react';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import { Section, ScrollReveal, BriefingCard, VitruvianBackground } from './components/Shared';
+import React, { useState, useEffect } from 'react';
+import Header from './Header';
+import Footer from './Footer';
+import { Section, ScrollReveal, BriefingCard, VitruvianBackground } from './Shared';
+import type { Page } from './types';
 import { Filter } from 'lucide-react';
-import { Page } from './App';
 
 interface BriefingsPageProps {
   onNavigate: (page: Page, hash?: string, id?: string) => void;
@@ -98,6 +98,10 @@ const categories = ["All", "Architecture", "Engineering", "Operations", "Strateg
 
 const BriefingsPage: React.FC<BriefingsPageProps> = ({ onNavigate }) => {
   const [selectedCategory, setSelectedCategory] = useState("All");
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const filteredBriefings = allBriefings.filter(
     (b) => !b.featured && (selectedCategory === "All" || b.category === selectedCategory)

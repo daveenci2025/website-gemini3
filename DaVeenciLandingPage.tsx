@@ -9,16 +9,17 @@ import Booking from './components/Booking';
 import Newsletter from './components/Newsletter';
 import Footer from './components/Footer';
 import { Section, ScrollReveal, Logo } from './components/Shared';
-import { Page } from './App';
+import type { Page } from './components/types';
 
 interface DaVeenciLandingPageProps {
   onNavigate: (page: Page, hash?: string, id?: string) => void;
+  activeSection?: string | null;
 }
 
-const DaVeenciLandingPage: React.FC<DaVeenciLandingPageProps> = ({ onNavigate }) => {
+const DaVeenciLandingPage: React.FC<DaVeenciLandingPageProps> = ({ onNavigate, activeSection }) => {
   return (
     <div className="flex flex-col w-full overflow-x-hidden">
-      <Header onNavigate={onNavigate} currentPage="landing" />
+      <Header onNavigate={onNavigate} currentPage="landing" activeSection={activeSection} />
       
       <Hero />
 

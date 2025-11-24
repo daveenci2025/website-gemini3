@@ -1,57 +1,122 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import DaVeenciLandingPage from './DaVeenciLandingPage';
-import BriefingsPage from './BriefingsPage';
-import BriefingDetailPage from './BriefingDetailPage';
-
-export type Page = 'landing' | 'briefings' | 'briefing-detail';
+import BriefingsPage from './components/BriefingsPage';
+import BriefingDetailPage from './components/BriefingDetailPage';
+import WhoWeArePage from './components/WhoWeArePage';
+import Calendar from './components/Calendar';
+import type { Page } from './components/types';
 
 const App: React.FC = () => {
   const [page, setPage] = useState<Page>('landing');
   const [selectedBriefingId, setSelectedBriefingId] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [targetSection, setTargetSection] = useState<string | null>(null);
 
-  // Handle browser back/forward buttons loosely (optional enhancement)
+  // Handle browser back/forward buttons
   useEffect(() => {
     window.onpopstate = (e) => {
        if (e.state?.page) {
          setPage(e.state.page);
          if (e.state.briefingId) setSelectedBriefingId(e.state.briefingId);
+         setActiveSection(null);
        }
     };
   }, []);
 
+  // Helper to scroll to a specific hash with polling
+  const scrollToHash = useCallback((hash: string) => {
+     const elementId = hash.replace('#', '');
+     let attempts = 0;
+     const maxAttempts = 50; // Try for ~2.5 seconds (50 * 50ms)
+
+     const checkAndScroll = () => {
+        const element = document.getElementById(elementId);
+        if (element) {
+           const headerOffset = 100; // Height of fixed header + visual breathing room
+           const elementPosition = element.getBoundingClientRect().top;
+           const offsetPosition = elementPosition + window.scrollY - headerOffset;
+           
+           window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+           });
+           
+           // Clear target once found and scrolled
+           setTargetSection(null);
+        } else if (attempts < maxAttempts) {
+           attempts++;
+           setTimeout(checkAndScroll, 50);
+        } else {
+           // Timeout - clear target
+           setTargetSection(null);
+        }
+     };
+
+     // Slight delay to allow any immediate reflows
+     setTimeout(checkAndScroll, 10);
+  }, []);
+
+  // Watch for page transitions to landing that have a target section pending
+  useEffect(() => {
+    if (page === 'landing' && targetSection) {
+      scrollToHash(targetSection);
+    }
+  }, [page, targetSection, scrollToHash]);
+
   const handleNavigate = (targetPage: Page, hash?: string, id?: string) => {
+    // Update basic routing state
     setPage(targetPage);
     if (id) setSelectedBriefingId(id);
+    
+    // Handle Active Section State (Visual)
+    if (hash) {
+      setActiveSection(hash);
+    } else if (targetPage !== 'landing') {
+      setActiveSection(null);
+    }
 
-    // Simple history push
+    // Set Target Section for Scrolling (Functional)
+    if (targetPage === 'landing' && hash) {
+       setTargetSection(hash);
+    }
+
+    // Push History State
     let path = '/';
     if (targetPage === 'briefings') path = '/briefings';
     if (targetPage === 'briefing-detail') path = `/briefings/${id}`;
-
+    if (targetPage === 'who-we-are') path = '/who-we-are';
+    if (targetPage === 'calendar') path = '/calendar';
     window.history.pushState({ page: targetPage, briefingId: id }, '', path);
 
-    if (targetPage === 'landing' && hash) {
-       // Allow time for render
-       setTimeout(() => {
-          const element = document.getElementById(hash.replace('#', ''));
-          element?.scrollIntoView({ behavior: 'smooth' });
-       }, 100);
-    } else {
-       window.scrollTo(0,0);
+    // Immediate Scroll Logic (if not waiting for landing page mount)
+    if (targetPage !== 'landing') {
+       window.scrollTo({ top: 0, behavior: 'auto' });
+    } else if (targetPage === 'landing' && !hash) {
+       // Navigate to landing top
+       window.scrollTo({ top: 0, behavior: 'auto' });
+    } else if (targetPage === 'landing' && hash && page === 'landing') {
+       // Already on landing, scroll immediately
+       scrollToHash(hash);
     }
   };
 
   return (
     <main className="antialiased font-sans text-ink bg-base min-h-screen selection:bg-accent/20">
       {page === 'landing' && (
-        <DaVeenciLandingPage onNavigate={handleNavigate} />
+        <DaVeenciLandingPage onNavigate={handleNavigate} activeSection={activeSection} />
       )}
       {page === 'briefings' && (
         <BriefingsPage onNavigate={handleNavigate} />
       )}
       {page === 'briefing-detail' && (
         <BriefingDetailPage onNavigate={handleNavigate} id={selectedBriefingId} />
+      )}
+      {page === 'who-we-are' && (
+        <WhoWeArePage onNavigate={handleNavigate} />
+      )}
+      {page === 'calendar' && (
+        <Calendar onNavigate={handleNavigate} />
       )}
     </main>
   );

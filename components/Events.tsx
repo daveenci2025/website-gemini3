@@ -1,6 +1,7 @@
 import React from 'react';
 import { Calendar as CalendarIcon, ArrowRight } from 'lucide-react';
-import { Section, SectionHeader, ScrollReveal, EventCardProps } from './Shared';
+import { Section, SectionHeader, ScrollReveal } from './Shared';
+import type { EventCardProps } from './types';
 
 const CodexEventCard: React.FC<EventCardProps & { index: number }> = ({ image, date, title, description, index }) => (
   <div className="group relative flex flex-col h-full min-h-[500px] bg-[#FDFBF7] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)]">

@@ -1,10 +1,10 @@
 
 import React, { useEffect } from 'react';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import { Section, ScrollReveal, VitruvianBackground, Button } from './components/Shared';
+import Header from './Header';
+import Footer from './Footer';
+import { Section, ScrollReveal, VitruvianBackground, Button } from './Shared';
+import type { Page } from './types';
 import { Clock, Tag, ChevronRight, Check, X, AlertTriangle, Lightbulb, BookOpen, Layers } from 'lucide-react';
-import { Page } from './App';
 
 interface BriefingDetailPageProps {
   onNavigate: (page: Page, hash?: string, id?: string) => void;
@@ -54,6 +54,10 @@ const briefingData = {
 };
 
 const BriefingDetailPage: React.FC<BriefingDetailPageProps> = ({ onNavigate, id }) => {
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // AEO: Inject Structured Data (JSON-LD)
   useEffect(() => {

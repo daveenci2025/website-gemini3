@@ -1,44 +1,7 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
-
-// --- Types & Interfaces ---
-
-export interface NavLink {
-  label: string;
-  href: string;
-}
-
-export interface CardProps {
-  title: string;
-  children: React.ReactNode;
-  label?: string;
-  className?: string;
-}
-
-export interface SectionProps {
-  id?: string;
-  className?: string;
-  children: React.ReactNode;
-  pattern?: 'none' | 'grid' | 'circles' | 'nodes';
-  overflow?: boolean;
-}
-
-export interface EventCardProps {
-  image: string;
-  date: string;
-  title: string;
-  description: string;
-}
-
-export interface BriefingCardProps {
-  title: string;
-  description: string;
-  image: string;
-  issueNo: string;
-  category: string;
-  className?: string;
-  onClick?: () => void;
-}
+import type { CardProps, SectionProps, BriefingCardProps } from './types';
 
 // --- Scroll Animation Hook & Component ---
 

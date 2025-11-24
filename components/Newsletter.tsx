@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Mail, ArrowRight } from 'lucide-react';
 import { Section, SectionHeader, ScrollReveal, GridPattern, Button, BriefingCard } from './Shared';
-import { Page } from '../App';
+import type { Page } from './types';
 
 interface NewsletterProps {
   onNavigate?: (page: Page, hash?: string, id?: string) => void;
