@@ -1,8 +1,8 @@
 import React from 'react';
 import { Section, SectionHeader, ScrollReveal, Card } from './Shared';
-import PilotPurgatory from '../images/The Pilot Purgatory.png';
-import ToolFatigue from '../images/The Tool Fatigue.png';
-import MarginSqueeze from '../images/The Margin Squeeze.png';
+import PilotPurgatory from '../images/The Pilot Purgatory.jpg';
+import ToolFatigue from '../images/The Tool Fatigue.jpg';
+import MarginSqueeze from '../images/The Margin Squeeze.jpg';
 
 const Problems: React.FC = () => (
   <Section id="problems" pattern="grid" className="bg-white/40">
