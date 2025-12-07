@@ -3,11 +3,14 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+const isProduction = process.env.NODE_ENV === 'production';
+const connectionString = process.env.DATABASE_URL;
+
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false // Required for some hosted databases like Render/Heroku
-    }
+    connectionString,
+    ssl: connectionString && connectionString.includes('localhost') ? false : {
+        rejectUnauthorized: false
+    },
 });
 
 export const query = (text: string, params?: any[]) => {

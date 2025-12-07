@@ -17,19 +17,25 @@ const createAuthClient = () => {
 };
 
 export const createCalendarEvent = async (eventDetails: any) => {
-    const { name, email, company, phone, reason, notes, date, time } = eventDetails;
+    const { name, email, company, phone, reason, notes, date, time, dateTime } = eventDetails;
 
     const auth = createAuthClient();
     const calendar = google.calendar({ version: 'v3', auth });
 
-    // Combine date and time into ISO string
-    // Assuming date is YYYY-MM-DD and time is HH:MM
-    const startDateTime = new Date(`${date}T${time}:00`);
+    // Use provided ISO dateTime or fallback to constructing it (legacy support)
+    let startDateTime: Date;
+    if (dateTime) {
+        startDateTime = new Date(dateTime);
+    } else {
+        startDateTime = new Date(`${date}T${time}:00`);
+    }
+
     const endDateTime = new Date(startDateTime.getTime() + 45 * 60000); // 45 min duration
 
     const event = {
         summary: `${name} | Astrid - AI Consultation`,
-        description: `• Identify inefficiencies in your current process.
+        description: `Agenda:
+• Identify inefficiencies in your current process.
 • Validate the right solutions for your goals.
 • Draft a roadmap for costs, savings, and timeline.
 
@@ -39,7 +45,7 @@ Reason: ${reason || 'N/A'}
 Notes: ${notes || 'N/A'}`,
         start: {
             dateTime: startDateTime.toISOString(),
-            timeZone: 'UTC',
+            timeZone: 'UTC', // We are providing absolute ISO time
         },
         end: {
             dateTime: endDateTime.toISOString(),
@@ -47,6 +53,7 @@ Notes: ${notes || 'N/A'}`,
         },
         attendees: [
             { email: email }, // Client gets invited
+            { email: process.env.GOOGLE_CALENDAR_ID }, // Send notification to the calendar ID
         ],
     };
 

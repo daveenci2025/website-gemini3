@@ -1,11 +1,11 @@
 import { query } from '../db';
 
 export const saveConsultationRequest = async (data: any) => {
-  const { name, email, phone, company, reason, notes, date, time } = data;
+  const { name, email, phone, company, reason, notes, date, time, dateTime } = data;
 
   // Combine date and time for scheduled_with (assuming UTC for simplicity or relying on DB to handle timezone if provided)
   // The user schema has 'shchedule_utc', let's construct a timestamp.
-  const scheduleUtc = new Date(`${date}T${time}:00`).toISOString();
+  const scheduleUtc = dateTime || new Date(`${date}T${time}:00`).toISOString();
 
   const text = `
     INSERT INTO consultation_request (

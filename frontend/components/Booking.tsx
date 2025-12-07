@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, Check, ChevronLeft, ChevronRight, User, Mail, Briefcase, Phone, HelpCircle, Clock } from 'lucide-react';
+import { format } from 'date-fns';
+import { fromZonedTime } from 'date-fns-tz';
 import { Section, ScrollReveal, Button, CustomSelect, Logo } from './Shared';
 import AstridSketch from '../images/Astrid_Sketch.jpg';
 import { API_ENDPOINTS } from '../config';
@@ -7,7 +9,7 @@ import { API_ENDPOINTS } from '../config';
 const Booking: React.FC = () => {
    const [currentDate, setCurrentDate] = useState(new Date());
    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+   const [selectedTime, setSelectedTime] = useState<string | null>(null); // Stores ISO string
    const [step, setStep] = useState<'datetime' | 'details' | 'success'>('datetime');
    const [busySlots, setBusySlots] = useState<{ start: string, end: string }[]>([]);
 
@@ -20,9 +22,34 @@ const Booking: React.FC = () => {
       notes: ''
    });
 
-   const availableTimeSlots = [
-      "07:00 AM", "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM"
-   ];
+   const TIMEZONE = 'America/Chicago';
+   const CST_HOURS = [7, 8, 9, 10, 11, 12];
+   const [displaySlots, setDisplaySlots] = useState<{ display: string, value: string }[]>([]);
+
+   useEffect(() => {
+      if (!selectedDate) {
+         setDisplaySlots([]);
+         return;
+      }
+
+      const year = selectedDate.getFullYear();
+      const month = selectedDate.getMonth() + 1;
+      const day = selectedDate.getDate();
+
+      const slots = CST_HOURS.map(hour => {
+         // Construct ISO string for CST time
+         const isoDateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hour).padStart(2, '0')}:00:00`;
+         // Convert to UTC Date object (representing that absolute time)
+         const utcDate = fromZonedTime(isoDateStr, TIMEZONE);
+
+         return {
+            display: format(utcDate, 'hh:mm a'),
+            value: utcDate.toISOString()
+         };
+      });
+
+      setDisplaySlots(slots);
+   }, [selectedDate]);
 
    const monthNames = ["January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
@@ -61,14 +88,8 @@ const Booking: React.FC = () => {
    const MEETING_DURATION_MINUTES = 45;
    const BUFFER_MINUTES = 10;
 
-   const checkSlotAvailability = (date: Date, timeStr: string) => {
-      const [time, modifier] = timeStr.split(' ');
-      let [hours, minutes] = time.split(':');
-      if (hours === '12') hours = '00';
-      if (modifier === 'PM') hours = (parseInt(hours, 10) + 12).toString();
-
-      const slotStart = new Date(date);
-      slotStart.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+   const checkSlotAvailability = (slotIsoTime: string) => {
+      const slotStart = new Date(slotIsoTime);
 
       // Our meeting window: need buffer BEFORE, meeting duration, and buffer AFTER
       const slotStartWithBuffer = new Date(slotStart.getTime() - BUFFER_MINUTES * 60000); // 10 min before
@@ -90,6 +111,17 @@ const Booking: React.FC = () => {
       return !hasConflict;
    };
 
+   const getSlotsForDate = (date: Date) => {
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+
+      return CST_HOURS.map(hour => {
+         const isoDateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hour).padStart(2, '0')}:00:00`;
+         return fromZonedTime(isoDateStr, TIMEZONE).toISOString();
+      });
+   };
+
    const isDateDisabled = (day: number) => {
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
       const today = new Date();
@@ -97,13 +129,13 @@ const Booking: React.FC = () => {
 
       if (date < today) return true;
 
-      const hasAvailableSlot = availableTimeSlots.some(time => checkSlotAvailability(date, time));
+      const slots = getSlotsForDate(date);
+      const hasAvailableSlot = slots.some(slotIso => checkSlotAvailability(slotIso));
       return !hasAvailableSlot;
    };
 
-   const isTimeDisabled = (timeStr: string) => {
-      if (!selectedDate) return true;
-      return !checkSlotAvailability(selectedDate, timeStr);
+   const isTimeDisabled = (slotIso: string) => {
+      return !checkSlotAvailability(slotIso);
    };
 
    // --- Calendar Helpers ---
@@ -154,24 +186,13 @@ const Booking: React.FC = () => {
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
 
-      const formatTime = (timeStr: string) => {
-         const [time, modifier] = timeStr.split(' ');
-         let [hours, minutes] = time.split(':');
-         if (hours === '12') hours = '00';
-         if (modifier === 'PM') hours = (parseInt(hours, 10) + 12).toString();
-         return `${hours}:${minutes}`;
-      };
-
-      const formattedTime = selectedTime ? formatTime(selectedTime) : '00:00';
-
       try {
          const response = await fetch(API_ENDPOINTS.book, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                ...formData,
-               date: selectedDate?.toISOString().split('T')[0],
-               time: formattedTime
+               dateTime: selectedTime // Send ISO string
             }),
          });
 
@@ -285,7 +306,7 @@ const Booking: React.FC = () => {
                            </div>
                            <div className="flex justify-between text-sm">
                               <span className="text-ink-muted">Time</span>
-                              <span className="font-medium text-ink">{selectedTime}</span>
+                              <span className="font-medium text-ink">{selectedTime ? format(new Date(selectedTime), 'hh:mm a') : ''}</span>
                            </div>
 
                            {formData.notes && (
@@ -358,21 +379,21 @@ const Booking: React.FC = () => {
                                  {selectedDate ? (
                                     <>
                                        <div className="grid grid-cols-3 gap-3 mb-6">
-                                          {availableTimeSlots.map(time => {
-                                             const disabled = isTimeDisabled(time);
+                                          {displaySlots.map(slot => {
+                                             const disabled = isTimeDisabled(slot.value);
                                              return (
                                                 <button
-                                                   key={time}
+                                                   key={slot.value}
                                                    disabled={disabled}
-                                                   onClick={() => !disabled && setSelectedTime(time)}
-                                                   className={`py-3 px-2 text-sm border rounded-sm transition-all text-center ${selectedTime === time
+                                                   onClick={() => !disabled && setSelectedTime(slot.value)}
+                                                   className={`py-3 px-2 text-sm border rounded-sm transition-all text-center ${selectedTime === slot.value
                                                       ? 'bg-accent text-white border-accent shadow-md scale-105'
                                                       : disabled
                                                          ? 'bg-base/50 text-ink-muted/30 border-ink/5 cursor-not-allowed'
                                                          : 'bg-white border-ink/10 text-ink hover:border-accent hover:text-accent hover:shadow-sm'
                                                       }`}
                                                 >
-                                                   {time}
+                                                   {slot.display}
                                                 </button>
                                              );
                                           })}
