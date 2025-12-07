@@ -1,8 +1,26 @@
 import { Router, Request, Response } from 'express';
 import { createCalendarEvent, getBusySlots } from './services/calendar';
 import { saveConsultationRequest } from './services/consultation';
+import { registerForEvent } from './services/events';
 
 const router = Router();
+
+router.post('/events/register', async (req: Request, res: Response) => {
+    try {
+        const result = await registerForEvent(req.body);
+        res.status(200).json({ success: true, result });
+    } catch (error: any) {
+        console.error('Event registration error:', error);
+        if (error?.code === '23505') {
+            return res.status(409).json({
+                success: false,
+                error: 'You are already registered for this event.',
+                isDuplicate: true
+            });
+        }
+        res.status(500).json({ success: false, error: 'Failed to register for event' });
+    }
+});
 
 router.post('/calendar/book', async (req: Request, res: Response) => {
     try {
@@ -15,16 +33,16 @@ router.post('/calendar/book', async (req: Request, res: Response) => {
         res.status(200).json({ success: true, event, dbRecord });
     } catch (error: any) {
         console.error('Booking error:', error);
-        
+
         // Handle duplicate booking error (same email + same time)
         if (error?.code === '23505') {
-            return res.status(409).json({ 
-                success: false, 
+            return res.status(409).json({
+                success: false,
                 error: 'You already have a consultation scheduled at this time. Check your email for the calendar invite.',
                 isDuplicate: true
             });
         }
-        
+
         res.status(500).json({ success: false, error: 'Failed to book consultation' });
     }
 });
