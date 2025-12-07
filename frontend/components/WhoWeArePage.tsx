@@ -5,6 +5,8 @@ import Footer from './Footer';
 import { Section, SectionHeader, ScrollReveal, VitruvianBackground, Button } from './Shared';
 import type { Page } from './types';
 import { Target, Users, Zap, Award, BarChart3, Clock } from 'lucide-react';
+import AntonSketch from '../images/Anton_Sketch.jpg';
+import AstridSketch from '../images/Astrid_Sketch.jpg';
 
 interface WhoWeArePageProps {
    onNavigate: (page: Page, hash?: string, id?: string) => void;
@@ -45,7 +47,7 @@ const WhoWeArePage: React.FC<WhoWeArePageProps> = ({ onNavigate }) => {
                   <ScrollReveal delay={200} className="flex flex-col items-center group">
                      <div className="w-full max-w-sm aspect-square relative mb-6 overflow-hidden rounded-sm shadow-sm">
                         <img
-                           src="/images/Anton_Sketch.jpg"
+                           src={AntonSketch}
                            onError={handleImageError}
                            alt="Anton Osipov"
                            className="w-full h-full object-cover object-top"
@@ -61,7 +63,7 @@ const WhoWeArePage: React.FC<WhoWeArePageProps> = ({ onNavigate }) => {
                   <ScrollReveal delay={400} className="flex flex-col items-center group">
                      <div className="w-full max-w-sm aspect-square relative mb-6 overflow-hidden rounded-sm shadow-sm">
                         <img
-                           src="/images/Astrid_Sketch.jpg"
+                           src={AstridSketch}
                            alt="Astrid Abrahamyan"
                            className="w-full h-full object-cover object-top"
                         />

@@ -13,8 +13,18 @@ router.post('/calendar/book', async (req: Request, res: Response) => {
         ]);
 
         res.status(200).json({ success: true, event, dbRecord });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Booking error:', error);
+        
+        // Handle duplicate booking error (same email + same time)
+        if (error?.code === '23505') {
+            return res.status(409).json({ 
+                success: false, 
+                error: 'You already have a consultation scheduled at this time. Check your email for the calendar invite.',
+                isDuplicate: true
+            });
+        }
+        
         res.status(500).json({ success: false, error: 'Failed to book consultation' });
     }
 });

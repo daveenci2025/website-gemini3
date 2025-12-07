@@ -3,6 +3,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Calendar as CalendarIcon, Clock, ChevronLeft, ChevronRight, Check, User, Briefcase, HelpCircle, ArrowLeft, Mail, Phone, ChevronDown } from 'lucide-react';
 import { Logo, Button, VitruvianBackground, ScrollReveal } from './Shared';
 import type { CalendarProps } from './types';
+import AstridSketch from '../images/Astrid_Sketch.jpg';
+import { API_ENDPOINTS } from '../config';
 
 // --- Custom Select Component ---
 interface CustomSelectProps {
@@ -77,7 +79,7 @@ const Calendar: React.FC<CalendarProps> = ({ onNavigate }) => {
       email: '',
       company: '',
       phone: '',
-      reason: 'Multiple areas (we’ll prioritize together)',
+      reason: "Multiple areas (we will prioritize together)",
       notes: ''
    });
 
@@ -106,31 +108,43 @@ const Calendar: React.FC<CalendarProps> = ({ onNavigate }) => {
       setSelectedDate(newDate);
       // Reset time when date changes
       setSelectedTime(null);
+      // Refresh availability when selecting a date
+      fetchAvailability();
    };
 
    const [busySlots, setBusySlots] = useState<{ start: string, end: string }[]>([]);
 
-   // Fetch availability when month changes (or on mount)
-   useEffect(() => {
-      const fetchAvailability = async () => {
-         const year = currentDate.getFullYear();
-         const month = currentDate.getMonth();
-         const start = new Date(year, month, 1).toISOString();
-         const end = new Date(year, month + 1, 0).toISOString();
+   // Fetch availability function (reusable)
+   const fetchAvailability = async () => {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const start = new Date(year, month, 1).toISOString();
+      const end = new Date(year, month + 1, 0).toISOString();
 
-         try {
-            const response = await fetch(`http://localhost:3001/api/calendar/availability?start=${start}&end=${end}`);
-            if (response.ok) {
-               const data = await response.json();
-               setBusySlots(data.busySlots);
-            }
-         } catch (error) {
-            console.error('Failed to fetch availability', error);
+      try {
+         const response = await fetch(`${API_ENDPOINTS.availability}?start=${start}&end=${end}`);
+         if (response.ok) {
+            const data = await response.json();
+            setBusySlots(data.busySlots);
          }
-      };
+      } catch (error) {
+         console.error('Failed to fetch availability', error);
+      }
+   };
 
+   // Fetch on mount and when month changes
+   useEffect(() => {
       fetchAvailability();
    }, [currentDate]);
+
+   // Auto-refresh availability every 30 seconds
+   useEffect(() => {
+      const interval = setInterval(fetchAvailability, 30000);
+      return () => clearInterval(interval);
+   }, [currentDate]);
+
+   const MEETING_DURATION_MINUTES = 45;
+   const BUFFER_MINUTES = 10;
 
    const checkSlotAvailability = (date: Date, timeStr: string) => {
       const [time, modifier] = timeStr.split(' ');
@@ -138,20 +152,27 @@ const Calendar: React.FC<CalendarProps> = ({ onNavigate }) => {
       if (hours === '12') hours = '00';
       if (modifier === 'PM') hours = (parseInt(hours, 10) + 12).toString();
 
-      const slotDate = new Date(date);
-      slotDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+      const slotStart = new Date(date);
+      slotStart.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+
+      // Our meeting window: need buffer BEFORE, meeting duration, and buffer AFTER
+      const slotStartWithBuffer = new Date(slotStart.getTime() - BUFFER_MINUTES * 60000); // 10 min before
+      const slotEnd = new Date(slotStart.getTime() + MEETING_DURATION_MINUTES * 60000); // 45 min meeting
+      const slotEndWithBuffer = new Date(slotEnd.getTime() + BUFFER_MINUTES * 60000); // 10 min after
 
       const now = new Date();
-      if (slotDate < now) return false; // Disabled (not available)
+      if (slotStart < now) return false;
 
-      // Check overlaps with busy slots
-      const isBusy = busySlots.some(slot => {
+      // Check if any busy period overlaps with our full blocked window (buffer + meeting + buffer)
+      const hasConflict = busySlots.some(slot => {
          const busyStart = new Date(slot.start);
          const busyEnd = new Date(slot.end);
-         return slotDate >= busyStart && slotDate < busyEnd;
+         // Conflict if busy period overlaps with [slotStartWithBuffer, slotEndWithBuffer]
+         // Two ranges overlap if: start1 < end2 AND end1 > start2
+         return slotStartWithBuffer < busyEnd && slotEndWithBuffer > busyStart;
       });
 
-      return !isBusy; // Available if not busy
+      return !hasConflict;
    };
 
    const isDateDisabled = (day: number) => {
@@ -190,23 +211,41 @@ const Calendar: React.FC<CalendarProps> = ({ onNavigate }) => {
       const formattedTime = selectedTime ? formatTime(selectedTime) : '00:00';
 
       try {
-         const response = await fetch('http://localhost:3001/api/calendar/book', {
+         const response = await fetch(API_ENDPOINTS.book, {
             method: 'POST',
             headers: {
                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                ...formData,
-               date: currentDate.toISOString().split('T')[0],
+               date: selectedDate?.toISOString().split('T')[0],
                time: formattedTime
             }),
          });
 
+         const data = await response.json();
+
          if (response.ok) {
             setStep('success');
+         } else if (response.status === 409 && data.isDuplicate) {
+            // Already booked - show friendly message and refresh availability
+            alert(data.error || 'You already have a consultation scheduled at this time.');
+            // Refresh availability to update the calendar
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const start = new Date(year, month, 1).toISOString();
+            const end = new Date(year, month + 1, 0).toISOString();
+            const availResponse = await fetch(`http://localhost:3001/api/calendar/availability?start=${start}&end=${end}`);
+            if (availResponse.ok) {
+               const availData = await availResponse.json();
+               setBusySlots(availData.busySlots);
+            }
+            // Go back to time selection
+            setStep('datetime');
+            setSelectedTime(null);
          } else {
-            console.error('Booking failed');
-            alert('Failed to book consultation. Please try again.');
+            console.error('Booking failed:', data.error);
+            alert(data.error || 'Failed to book consultation. Please try again.');
          }
       } catch (error) {
          console.error('Error submitting booking:', error);
@@ -245,7 +284,7 @@ const Calendar: React.FC<CalendarProps> = ({ onNavigate }) => {
 
                            <div className="flex items-center gap-4 py-6 border-y border-ink/5 mb-6">
                               <div className="w-20 h-20 rounded-sm overflow-hidden border border-ink/10 flex-shrink-0">
-                                 <img src="/images/Astrid_Sketch.jpg" alt="Astrid Abrahamyan" className="w-full h-full object-cover object-top scale-125" />
+                                 <img src={AstridSketch} alt="Astrid Abrahamyan" className="w-full h-full object-cover object-top scale-125" />
                               </div>
                               <div>
                                  <div className="font-serif text-ink text-lg leading-none mb-1">Astrid Abrahamyan</div>
@@ -259,15 +298,15 @@ const Calendar: React.FC<CalendarProps> = ({ onNavigate }) => {
                            <ul className="space-y-4">
                               <li className="flex gap-3 text-sm text-ink-muted">
                                  <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 flex-shrink-0"></div>
-                                 <span>Current stack & bottleneck analysis</span>
+                                 <span>Identify inefficiencies in your current process</span>
                               </li>
                               <li className="flex gap-3 text-sm text-ink-muted">
                                  <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 flex-shrink-0"></div>
-                                 <span>Feasibility check for specific workflows</span>
+                                 <span>Validate the right solutions for your goals</span>
                               </li>
                               <li className="flex gap-3 text-sm text-ink-muted">
                                  <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 flex-shrink-0"></div>
-                                 <span>ROI estimation & roadmap draft</span>
+                                 <span>Draft a roadmap for costs, savings, and timeline</span>
                               </li>
                            </ul>
 
@@ -473,7 +512,7 @@ const Calendar: React.FC<CalendarProps> = ({ onNavigate }) => {
                                              value={formData.reason}
                                              onChange={(val) => setFormData({ ...formData, reason: val })}
                                              options={[
-                                                "Multiple areas (we’ll prioritize together)",
+                                                "Multiple areas (we will prioritize together)",
                                                 "Improve sales pipeline & CRM",
                                                 "Grow inbound leads & marketing",
                                                 "Automate workflows & reduce costs",

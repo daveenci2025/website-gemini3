@@ -2,16 +2,25 @@ import { google } from 'googleapis';
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 
+// Create auth client with Domain-Wide Delegation (impersonating the calendar owner)
+const createAuthClient = () => {
+    return new google.auth.GoogleAuth({
+        credentials: {
+            client_email: process.env.GOOGLE_CLIENT_EMAIL,
+            private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        },
+        scopes: SCOPES,
+        clientOptions: {
+            subject: process.env.GOOGLE_CALENDAR_OWNER_EMAIL, // Impersonate this user
+        },
+    });
+};
+
 export const createCalendarEvent = async (eventDetails: any) => {
     const { name, email, company, phone, reason, notes, date, time } = eventDetails;
 
-    const jwtClient = new google.auth.JWT({
-        email: process.env.GOOGLE_CLIENT_EMAIL,
-        key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        scopes: SCOPES,
-    });
-
-    const calendar = google.calendar({ version: 'v3', auth: jwtClient });
+    const auth = createAuthClient();
+    const calendar = google.calendar({ version: 'v3', auth });
 
     // Combine date and time into ISO string
     // Assuming date is YYYY-MM-DD and time is HH:MM
@@ -19,21 +28,15 @@ export const createCalendarEvent = async (eventDetails: any) => {
     const endDateTime = new Date(startDateTime.getTime() + 45 * 60000); // 45 min duration
 
     const event = {
-        summary: 'AI Consultation with Astrid (1:1)',
-        description: `
-      <b>Session Agenda:</b><br/>
-      <ul>
-        <li>Current stack & bottleneck analysis</li>
-        <li>Feasibility check for specific workflows</li>
-        <li>ROI estimation & roadmap draft</li>
-      </ul>
-      <br/>
-      <b>Client Details:</b><br/>
-      Name: ${name}<br/>
-      Company: ${company}<br/>
-      Reason: ${reason}<br/>
-      Notes: ${notes}
-    `,
+        summary: `${name} | Astrid - AI Consultation`,
+        description: `• Identify inefficiencies in your current process.
+• Validate the right solutions for your goals.
+• Draft a roadmap for costs, savings, and timeline.
+
+Client Details:
+Company: ${company || 'N/A'}
+Reason: ${reason || 'N/A'}
+Notes: ${notes || 'N/A'}`,
         start: {
             dateTime: startDateTime.toISOString(),
             timeZone: 'UTC',
@@ -42,16 +45,16 @@ export const createCalendarEvent = async (eventDetails: any) => {
             dateTime: endDateTime.toISOString(),
             timeZone: 'UTC',
         },
-        // attendees: [
-        //     { email: email }, // Client
-        //     { email: process.env.GOOGLE_CALENDAR_ID } // Consultant (Astrid/Anton)
-        // ],
+        attendees: [
+            { email: email }, // Client gets invited
+        ],
     };
 
     try {
         const response = await calendar.events.insert({
-            calendarId: 'primary', // Use Service Account's calendar to allow invites
+            calendarId: process.env.GOOGLE_CALENDAR_ID,
             requestBody: event,
+            sendUpdates: 'all', // Send email invitations to attendees
         });
         return response.data;
     } catch (error) {
@@ -61,13 +64,8 @@ export const createCalendarEvent = async (eventDetails: any) => {
 };
 
 export const getBusySlots = async (start: string, end: string) => {
-    const jwtClient = new google.auth.JWT({
-        email: process.env.GOOGLE_CLIENT_EMAIL,
-        key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        scopes: SCOPES,
-    });
-
-    const calendar = google.calendar({ version: 'v3', auth: jwtClient });
+    const auth = createAuthClient();
+    const calendar = google.calendar({ version: 'v3', auth });
 
     try {
         const response = await calendar.freebusy.query({
