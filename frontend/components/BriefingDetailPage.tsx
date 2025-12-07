@@ -12,70 +12,85 @@ interface BriefingDetailPageProps {
    id?: string | null;
 }
 
-// NOTE: In a real app, this would be fetched from an API/CMS
-// We are hardcoding one full example to demonstrate the AEO structure
-const briefingData = {
-   id: "agentic-workflow",
-   title: "The Agentic Workflow: Architecting Swarms",
-   metaDescription: "A technical guide to moving beyond chat interfaces. Learn how to architect autonomous agent swarms, implement the 4-stage reasoning pipeline, and deploy self-correcting AI workers.",
-   publishDate: "2025-10-14",
-   author: "Leonardo & Team",
-   category: "Architecture",
-   readTime: "8 min read",
-   issueNo: "042",
-   image: AgenticWorkflowImage,
-
-   // AEO: The Quick Answer (Snippet Bait)
-   quickAnswer: "An **Agentic Workflow** is a system where AI models act as autonomous agents that can plan, execute tools, reflect on results, and iterate without human intervention. Unlike a standard chatbot (Zero-Shot), an agentic workflow involves a loop of *Reasoning → Acting → Observing → Correcting*. This approach increases accuracy on complex tasks by 40-60% compared to single-prompt chains.",
-
-   toc: [
-      "Introduction",
-      "Key Takeaways",
-      "Real-World Example",
-      "Pros & Cons",
-      "Alternatives",
-      "Troubleshooting",
-      "FAQ"
-   ],
-
-   faqs: [
-      {
-         question: "What is the difference between a Chain and an Agent?",
-         answer: "A Chain is a hard-coded sequence of steps (A -> B -> C). An Agent uses an LLM as a reasoning engine to decide which steps to take and in what order based on the user's goal."
-      },
-      {
-         question: "Which model is best for agentic workflows?",
-         answer: "Currently, Gemini 1.5 Pro and GPT-4o are the leaders due to their high reasoning capabilities and large context windows. Smaller models like Flash or Llama 3-8b struggle with multi-step planning."
-      },
-      {
-         question: "How do I prevent agents from getting stuck in loops?",
-         answer: "Implement a 'Maximum Iteration' counter and a 'Supervisor' agent. If the worker agent fails 3 times, the Supervisor should intervene or halt the process to save token costs."
-      }
-   ]
+// Briefing Data Dictionary
+const briefings: Record<string, any> = {
+   "agentic-workflow": {
+      id: "agentic-workflow",
+      title: "The Agentic Workflow: Architecting Swarms",
+      metaDescription: "A technical guide to moving beyond chat interfaces. Learn how to architect autonomous agent swarms, implement the 4-stage reasoning pipeline, and deploy self-correcting AI workers.",
+      publishDate: "2025-10-14",
+      author: "Leonardo & Team",
+      category: "Architecture",
+      readTime: "8 min read",
+      issueNo: "042",
+      image: AgenticWorkflowImage,
+      quickAnswer: "An **Agentic Workflow** is a system where AI models act as autonomous agents that can plan, execute tools, reflect on results, and iterate without human intervention. Unlike a standard chatbot (Zero-Shot), an agentic workflow involves a loop of *Reasoning → Acting → Observing → Correcting*. This approach increases accuracy on complex tasks by 40-60% compared to single-prompt chains.",
+      toc: ["Introduction", "Key Takeaways", "Real-World Example", "Pros & Cons", "Alternatives", "Troubleshooting", "FAQ"],
+      faqs: [
+         { question: "What is the difference between a Chain and an Agent?", answer: "A Chain is a hard-coded sequence of steps (A -> B -> C). An Agent uses an LLM as a reasoning engine to decide which steps to take and in what order based on the user's goal." },
+         { question: "Which model is best for agentic workflows?", answer: "Currently, Gemini 1.5 Pro and GPT-4o are the leaders due to their high reasoning capabilities and large context windows. Smaller models like Flash or Llama 3-8b struggle with multi-step planning." },
+         { question: "How do I prevent agents from getting stuck in loops?", answer: "Implement a 'Maximum Iteration' counter and a 'Supervisor' agent. If the worker agent fails 3 times, the Supervisor should intervene or halt the process to save token costs." }
+      ]
+   },
+   "synthetic-data": {
+      id: "synthetic-data",
+      title: "Synthetic Data Pipelines: The Infinite Dataset",
+      metaDescription: "Running out of human data? Here is the playbook for generating high-fidelity synthetic datasets to fine-tune your models without privacy risks.",
+      publishDate: "2025-10-21",
+      author: "Leonardo & Team",
+      category: "Engineering",
+      readTime: "6 min read",
+      issueNo: "043",
+      image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1600",
+      quickAnswer: "**Synthetic Data** is artificially generated information that mimics real-world data properties. It solves the 'Cold Start' problem for AI models where training data is scarce, expensive, or sensitive (PII). By using seed samples and procedural generation, teams can create infinite, balanced datasets to train robust models.",
+      toc: ["Introduction", "The Data Scarcity Problem", "Generation Techniques", "Validation Metrics", "Tools & Frameworks", "FAQ"],
+      faqs: [
+         { question: "Is synthetic data as good as real data?", answer: "For many tasks, yes. In fact, it can be better because you can perfectly balance edge cases that are rare in real life." },
+         { question: "Does it hallucinate?", answer: "It can. That's why 'Human-in-the-Loop' validation on a small subset is crucial before full-scale training." }
+      ]
+   },
+   "zero-touch-crm": {
+      id: "zero-touch-crm",
+      title: "The Zero-Touch CRM: Self-Healing Databases",
+      metaDescription: "A technical deep dive into self-healing customer databases that enrich themselves without sales rep intervention.",
+      publishDate: "2025-10-28",
+      author: "Leonardo & Team",
+      category: "Operations",
+      readTime: "5 min read",
+      issueNo: "044",
+      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1600",
+      quickAnswer: "A **Zero-Touch CRM** uses background AI agents to monitor communication channels (email, Slack, calls) and automatically update customer records. It eliminates manual data entry, ensures 100% data hygiene, and can autonomously trigger follow-up workflows based on changes in deal status.",
+      toc: ["Introduction", "The Data Decay Problem", "Architecture", "Privacy & Security", "Implementation Guide", "FAQ"],
+      faqs: [
+         { question: "How does it handle privacy?", answer: "Agents are scoped to specific fields and PII is redacted before processing by external LLMs." },
+         { question: "Can it replace a RevOps team?", answer: "No, it augments them. It handles the grunt work of data entry so RevOps can focus on strategy and analysis." }
+      ]
+   }
 };
 
 const BriefingDetailPage: React.FC<BriefingDetailPageProps> = ({ onNavigate, id }) => {
+   const data = (id && briefings[id]) ? briefings[id] : briefings["agentic-workflow"]; // Default to agentic if not found
 
    useEffect(() => {
       window.scrollTo(0, 0);
-   }, []);
+   }, [id]);
 
    // AEO: Inject Structured Data (JSON-LD)
    useEffect(() => {
       const schemaData = {
          "@context": "https://schema.org",
          "@type": "TechArticle",
-         "headline": briefingData.title,
-         "image": [briefingData.image],
-         "datePublished": briefingData.publishDate,
+         "headline": data.title,
+         "image": [data.image],
+         "datePublished": data.publishDate,
          "author": [{
             "@type": "Organization",
             "name": "DaVeenci Consulting"
          }],
-         "description": briefingData.metaDescription,
+         "description": data.metaDescription,
          "mainEntity": {
             "@type": "FAQPage",
-            "mainEntity": briefingData.faqs.map(faq => ({
+            "mainEntity": (data.faqs || []).map((faq: any) => ({
                "@type": "Question",
                "name": faq.question,
                "acceptedAnswer": {
@@ -94,11 +109,7 @@ const BriefingDetailPage: React.FC<BriefingDetailPageProps> = ({ onNavigate, id 
       return () => {
          document.head.removeChild(script);
       };
-   }, []);
-
-   // Use dummy data if ID matches, else show generic filler for demo
-   const isDemoArticle = id === "agentic-workflow";
-   const data = isDemoArticle ? briefingData : { ...briefingData, title: "Briefing Content Loading...", quickAnswer: "Content for this specific briefing is being retrieved from the Codex archive. Please check back or view 'The Agentic Workflow' for the demo structure." };
+   }, [data]);
 
    return (
       <div className="flex flex-col w-full min-h-screen bg-base">
