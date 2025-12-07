@@ -6,6 +6,8 @@ import AgenticWorkflowImage from '../images/001 - What is an Agentic Workflow.jp
 import SyntheticDataImage from '../images/002 - Synthetic Data Pipelines.jpg';
 import ZeroTouchCRMImage from '../images/003 - Zero-Touch CRM.jpg';
 
+import { API_ENDPOINTS } from '../config';
+
 interface NewsletterProps {
    onNavigate?: (page: Page, hash?: string, id?: string) => void;
 }
@@ -22,7 +24,7 @@ const Newsletter: React.FC<NewsletterProps> = ({ onNavigate }) => {
       setMessage('');
 
       try {
-         const response = await fetch('http://localhost:3001/api/newsletter/subscribe', {
+         const response = await fetch(API_ENDPOINTS.newsletter, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email }),
