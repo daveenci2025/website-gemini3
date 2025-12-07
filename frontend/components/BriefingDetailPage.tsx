@@ -715,7 +715,7 @@ const BriefingDetailPage: React.FC<BriefingDetailPageProps> = ({ onNavigate, id 
                   </ul>
                   <div className="mt-8 pt-8 border-t border-ink/10">
                      <p className="text-xs text-ink-muted mb-4">Need this implemented?</p>
-                     <Button variant="primary" className="w-full text-xs py-2" onClick={() => onNavigate('home', 'booking')}>Book Strategy</Button>
+                     <Button variant="primary" className="w-full text-xs py-2" onClick={() => onNavigate('landing', 'booking')}>Book Strategy</Button>
                   </div>
                </div>
             </aside>

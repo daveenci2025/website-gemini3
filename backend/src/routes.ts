@@ -2,8 +2,31 @@ import { Router, Request, Response } from 'express';
 import { createCalendarEvent, getBusySlots } from './services/calendar';
 import { saveConsultationRequest } from './services/consultation';
 import { registerForEvent } from './services/events';
+import { subscribeToNewsletter } from './services/newsletter';
 
 const router = Router();
+
+router.post('/newsletter/subscribe', async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ success: false, error: 'Email is required' });
+        }
+
+        const result = await subscribeToNewsletter(email);
+        res.status(200).json({ success: true, result });
+    } catch (error: any) {
+        console.error('Newsletter subscription error:', error);
+        if (error?.code === '23505') {
+            return res.status(409).json({
+                success: false,
+                error: 'You are already subscribed to the newsletter.',
+                isDuplicate: true
+            });
+        }
+        res.status(500).json({ success: false, error: 'Failed to subscribe to newsletter' });
+    }
+});
 
 router.post('/events/register', async (req: Request, res: Response) => {
     try {
