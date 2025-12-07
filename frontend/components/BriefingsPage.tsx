@@ -5,9 +5,9 @@ import Footer from './Footer';
 import { Section, ScrollReveal, BriefingCard, VitruvianBackground } from './Shared';
 import type { Page } from './types';
 import { Filter } from 'lucide-react';
-import AgenticWorkflowImage from '../images/001 - What is an Agentic Workflow.png';
-import SyntheticDataImage from '../images/002 - Synthetic Data Pipelines.png';
-import ZeroTouchCRMImage from '../images/003 - Zero-Touch CRM.png';
+import AgenticWorkflowImage from '../images/001 - What is an Agentic Workflow.jpg';
+import SyntheticDataImage from '../images/002 - Synthetic Data Pipelines.jpg';
+import ZeroTouchCRMImage from '../images/003 - Zero-Touch CRM.jpg';
 
 interface BriefingsPageProps {
   onNavigate: (page: Page, hash?: string, id?: string) => void;
@@ -154,8 +154,8 @@ const BriefingsPage: React.FC<BriefingsPageProps> = ({ onNavigate }) => {
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${selectedCategory === cat
-                    ? 'bg-accent text-white shadow-md'
-                    : 'text-ink-muted hover:text-ink hover:bg-white/80'
+                  ? 'bg-accent text-white shadow-md'
+                  : 'text-ink-muted hover:text-ink hover:bg-white/80'
                   }`}
               >
                 {cat}

@@ -2,9 +2,9 @@ import React from 'react';
 import { Mail, ArrowRight } from 'lucide-react';
 import { Section, SectionHeader, ScrollReveal, GridPattern, Button, BriefingCard } from './Shared';
 import type { Page } from './types';
-import AgenticWorkflowImage from '../images/001 - What is an Agentic Workflow.png';
-import SyntheticDataImage from '../images/002 - Synthetic Data Pipelines.png';
-import ZeroTouchCRMImage from '../images/003 - Zero-Touch CRM.png';
+import AgenticWorkflowImage from '../images/001 - What is an Agentic Workflow.jpg';
+import SyntheticDataImage from '../images/002 - Synthetic Data Pipelines.jpg';
+import ZeroTouchCRMImage from '../images/003 - Zero-Touch CRM.jpg';
 
 interface NewsletterProps {
    onNavigate?: (page: Page, hash?: string, id?: string) => void;

@@ -4,9 +4,9 @@ import Footer from './Footer';
 import { Section, ScrollReveal, VitruvianBackground, Button } from './Shared';
 import type { Page } from './types';
 import { Clock, Tag, ChevronRight, Check, X, AlertTriangle, Lightbulb, BookOpen, Layers } from 'lucide-react';
-import AgenticWorkflowImage from '../images/001 - What is an Agentic Workflow.png';
-import SyntheticDataImage from '../images/002 - Synthetic Data Pipelines.png';
-import ZeroTouchCRMImage from '../images/003 - Zero-Touch CRM.png';
+import AgenticWorkflowImage from '../images/001 - What is an Agentic Workflow.jpg';
+import SyntheticDataImage from '../images/002 - Synthetic Data Pipelines.jpg';
+import ZeroTouchCRMImage from '../images/003 - Zero-Touch CRM.jpg';
 
 interface BriefingDetailPageProps {
    onNavigate: (page: Page, hash?: string, id?: string) => void;

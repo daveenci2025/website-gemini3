@@ -3,9 +3,9 @@ import { Calendar as CalendarIcon, ArrowRight, X, Check, Loader2 } from 'lucide-
 import { format, addDays, getDay, setDay, startOfDay, addWeeks } from 'date-fns';
 import { Section, SectionHeader, ScrollReveal } from './Shared';
 import type { EventCardProps } from './types';
-import NetworkingImage from '../images/01 - Networking Session.png';
-import AEOvsSEOImage from '../images/02 - Battle Between AEO and SEO.png';
-import OwnYourStackImage from '../images/03 - Own Your Stack.png';
+import NetworkingImage from '../images/01 - Networking Session.jpg';
+import AEOvsSEOImage from '../images/02 - Battle Between AEO and SEO.jpg';
+import OwnYourStackImage from '../images/03 - Own Your Stack.jpg';
 import { API_ENDPOINTS } from '../config';
 
 interface RegistrationModalProps {
