@@ -3,6 +3,8 @@ import { Mail, ArrowRight } from 'lucide-react';
 import { Section, SectionHeader, ScrollReveal, GridPattern, Button, BriefingCard } from './Shared';
 import type { Page } from './types';
 import AgenticWorkflowImage from '../images/001 - What is an Agentic Workflow.png';
+import SyntheticDataImage from '../images/002 - Synthetic Data Pipelines.png';
+import ZeroTouchCRMImage from '../images/003 - Zero-Touch CRM.png';
 
 interface NewsletterProps {
    onNavigate?: (page: Page, hash?: string, id?: string) => void;
@@ -33,7 +35,7 @@ const Newsletter: React.FC<NewsletterProps> = ({ onNavigate }) => (
             <BriefingCard
                title="Synthetic Data Pipelines"
                description="Running out of human data? Here is the playbook for generating high-fidelity synthetic datasets to fine-tune your models."
-               image="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800"
+               image={SyntheticDataImage}
                issueNo="043"
                category="Engineering"
                onClick={() => onNavigate?.('briefing-detail', undefined, 'synthetic-data')}
@@ -43,7 +45,7 @@ const Newsletter: React.FC<NewsletterProps> = ({ onNavigate }) => (
             <BriefingCard
                title="The Zero-Touch CRM"
                description="A technical deep dive into self-healing customer databases that enrich themselves without sales rep intervention."
-               image="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800"
+               image={ZeroTouchCRMImage}
                issueNo="044"
                category="Operations"
                onClick={() => onNavigate?.('briefing-detail', undefined, 'zero-touch-crm')}
