@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { createCalendarEvent, getBusySlots } from './services/calendar';
-import { saveConsultationRequest } from './services/consultation';
+import { saveConsultationRequest, getBookedSlots } from './services/consultation';
 import { registerForEvent } from './services/events';
 import { subscribeToNewsletter } from './services/newsletter';
 
@@ -77,9 +77,16 @@ router.get('/calendar/availability', async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Missing start or end date' });
         }
 
-        // @ts-ignore
-        const busySlots = await getBusySlots(start as string, end as string);
-        res.json({ busySlots });
+        // Fetch both Google Calendar busy slots AND database bookings
+        const [googleBusySlots, dbBookedSlots] = await Promise.all([
+            getBusySlots(start as string, end as string),
+            getBookedSlots(start as string, end as string)
+        ]);
+
+        // Merge both sources of busy times
+        const allBusySlots = [...googleBusySlots, ...dbBookedSlots];
+
+        res.json({ busySlots: allBusySlots });
     } catch (error) {
         console.error('Availability error:', error);
         res.status(500).json({ error: 'Failed to fetch availability' });

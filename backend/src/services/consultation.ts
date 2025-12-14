@@ -33,3 +33,28 @@ export const saveConsultationRequest = async (data: any) => {
     throw err;
   }
 };
+
+export const getBookedSlots = async (start: string, end: string) => {
+  const text = `
+    SELECT schedule_utc
+    FROM consultation_request
+    WHERE schedule_utc >= $1 AND schedule_utc <= $2
+    ORDER BY schedule_utc ASC
+  `;
+
+  const values = [start, end];
+
+  try {
+    const res = await query(text, values);
+    // Convert to same format as Google Calendar busy slots
+    // Assume 45 minute meetings
+    const slots = res.rows.map(row => ({
+      start: new Date(row.schedule_utc).toISOString(),
+      end: new Date(new Date(row.schedule_utc).getTime() + 45 * 60000).toISOString()
+    }));
+    return slots;
+  } catch (err) {
+    console.error('Error fetching booked slots:', err);
+    throw err;
+  }
+};

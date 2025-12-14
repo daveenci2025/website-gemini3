@@ -8,6 +8,7 @@ import { Filter } from 'lucide-react';
 import AgenticWorkflowImage from '../images/001 - What is an Agentic Workflow.jpg';
 import SyntheticDataImage from '../images/002 - Synthetic Data Pipelines.jpg';
 import ZeroTouchCRMImage from '../images/003 - Zero-Touch CRM.jpg';
+import RagVsContextImage from '../images/004 - RAG vs. Long Context.jpg';
 
 interface BriefingsPageProps {
   onNavigate: (page: Page, hash?: string, id?: string) => void;
@@ -43,10 +44,10 @@ export const allBriefings = [
   },
   {
     id: "rag-vs-long-context",
-    title: "RAG vs Long Context",
-    description: "When to use Retrieval Augmented Generation vs Gemini's 2M token context window. A cost and latency analysis.",
-    image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800",
-    issueNo: "041",
+    title: "RAG vs. Long Context: The Architecture of Memory",
+    description: "Is RAG dead? We analyze the cost, latency, and reasoning trade-offs between Retrieval Augmented Generation and Gemini 1.5 Pro's 2M token context window.",
+    image: RagVsContextImage,
+    issueNo: "045",
     category: "Engineering",
     featured: false,
   },

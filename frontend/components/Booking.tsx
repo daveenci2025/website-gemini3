@@ -22,9 +22,14 @@ const Booking: React.FC = () => {
       notes: ''
    });
 
-   const TIMEZONE = 'America/Chicago';
-   const CST_HOURS = [7, 8, 9, 10, 11, 12];
-   const [displaySlots, setDisplaySlots] = useState<{ display: string, value: string }[]>([]);
+   // Business hours are defined in consultant's timezone (Chicago)
+   const BUSINESS_TIMEZONE = 'America/Chicago';
+   const BUSINESS_HOURS = [6, 7, 8, 9, 10, 11]; // 6 AM - 11 AM Central Time
+
+   // But display times in user's local timezone
+   const USER_TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+   const [displaySlots, setDisplaySlots] = useState<{ display: string, value: string, localTime: string }[]>([]);
 
    useEffect(() => {
       if (!selectedDate) {
@@ -36,17 +41,29 @@ const Booking: React.FC = () => {
       const month = selectedDate.getMonth() + 1;
       const day = selectedDate.getDate();
 
-      const slots = CST_HOURS.map(hour => {
-         // Construct ISO string for CST time
+      const slots = BUSINESS_HOURS.map(hour => {
+         // Construct ISO string for Chicago time (business hours)
          const isoDateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hour).padStart(2, '0')}:00:00`;
-         // Convert to UTC Date object (representing that absolute time)
-         const utcDate = fromZonedTime(isoDateStr, TIMEZONE);
+         // Convert Chicago time to UTC
+         const utcDate = fromZonedTime(isoDateStr, BUSINESS_TIMEZONE);
+
+         // Format for display in user's local timezone
+         const localTimeDisplay = utcDate.toLocaleTimeString(undefined, {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+            timeZone: USER_TIMEZONE
+         });
 
          return {
-            display: format(utcDate, 'hh:mm a'),
-            value: utcDate.toISOString()
+            display: localTimeDisplay,
+            value: utcDate.toISOString(),
+            localTime: USER_TIMEZONE
          };
       });
+
+      // Sort slots chronologically by UTC time (which ensures correct local time order)
+      slots.sort((a, b) => new Date(a.value).getTime() - new Date(b.value).getTime());
 
       setDisplaySlots(slots);
    }, [selectedDate]);
@@ -60,8 +77,11 @@ const Booking: React.FC = () => {
    const fetchAvailability = async () => {
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
-      const start = new Date(year, month, 1).toISOString();
-      const end = new Date(year, month + 1, 0).toISOString();
+      const start = new Date(year, month, 1 - 7).toISOString();
+      // Get last day of month and extend by 7 days
+      const lastDay = new Date(year, month + 1, 0 + 7);
+      lastDay.setHours(23, 59, 59, 999);
+      const end = lastDay.toISOString();
 
       try {
          const response = await fetch(`${API_ENDPOINTS.availability}?start=${start}&end=${end}`);
@@ -116,9 +136,9 @@ const Booking: React.FC = () => {
       const month = date.getMonth() + 1;
       const day = date.getDate();
 
-      return CST_HOURS.map(hour => {
+      return BUSINESS_HOURS.map(hour => {
          const isoDateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hour).padStart(2, '0')}:00:00`;
-         return fromZonedTime(isoDateStr, TIMEZONE).toISOString();
+         return fromZonedTime(isoDateStr, BUSINESS_TIMEZONE).toISOString();
       });
    };
 
@@ -206,8 +226,11 @@ const Booking: React.FC = () => {
             // Refresh availability to update the calendar
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-            const start = new Date(year, month, 1).toISOString();
-            const end = new Date(year, month + 1, 0).toISOString();
+            const start = new Date(year, month, 1 - 7).toISOString();
+            // Get last day of month and extend by 7 days
+            const lastDay = new Date(year, month + 1, 0 + 7);
+            lastDay.setHours(23, 59, 59, 999);
+            const end = lastDay.toISOString();
             const availResponse = await fetch(`http://localhost:3001/api/calendar/availability?start=${start}&end=${end}`);
             if (availResponse.ok) {
                const availData = await availResponse.json();

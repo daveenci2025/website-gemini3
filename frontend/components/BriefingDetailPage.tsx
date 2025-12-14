@@ -7,6 +7,7 @@ import { Clock, Tag, ChevronRight, Check, X, AlertTriangle, Lightbulb, BookOpen,
 import AgenticWorkflowImage from '../images/001 - What is an Agentic Workflow.jpg';
 import SyntheticDataImage from '../images/002 - Synthetic Data Pipelines.jpg';
 import ZeroTouchCRMImage from '../images/003 - Zero-Touch CRM.jpg';
+import RagVsContextImage from '../images/004 - RAG vs. Long Context.jpg';
 
 interface BriefingDetailPageProps {
    onNavigate: (page: Page, hash?: string, id?: string) => void;
@@ -614,6 +615,188 @@ const briefings: Record<string, BriefingData> = {
          { question: "Does this work with legacy CRMs like Salesforce?", answer: "Yes. While newer CRMs (Attio, folk) have this native, you can build Zero-Touch pipelines on top of Salesforce using their API or middleware tools like Zapier/Make combined with OpenAI." },
          { question: "How do you handle 'Hallucinations' in data entry?", answer: "You implement 'Confidence Scores.' If the AI is 99% sure it found a phone number, it updates the field. If it is only 60% sure, it creates a 'Task' for a human to verify the data." },
          { question: "Is it legal to scrape LinkedIn for this?", answer: "Direct scraping is against LinkedIn ToS. However, using authorized data vendors (like PeopleDataLabs or Clearbit) who aggregate public data is the standard, compliant workaround." }
+      ]
+   },
+   "rag-vs-long-context": {
+      id: "rag-vs-long-context",
+      title: "RAG vs. Long Context: The Architecture of Memory",
+      metaDescription: "Is RAG dead? We analyze the cost, latency, and reasoning trade-offs between Retrieval Augmented Generation and Gemini 1.5 Pro's 2M token context window.",
+      publishDate: "2025-11-04",
+      author: "Leonardo & Team",
+      category: "Engineering",
+      readTime: "12 min read",
+      issueNo: "045",
+      image: RagVsContextImage,
+      quickAnswerTitle: "Should I use RAG or a Long Context Window?",
+      quickAnswer: "The decision comes down to **Data Dynamism** and **Cost-per-Query**.<br/><br/>Use **RAG** (Retrieval Augmented Generation) when your dataset is massive (Gigabytes/Terabytes), rapidly changing (e.g., live news), or when you need low latency and low cost for thousands of simple queries. RAG is the \"Search Engine\" approach.<br/><br/>Use **Long Context** (Gemini 1.5 Pro, Claude 3.5) when your task requires \"Global Reasoning\" across a specific, static set of heavy documents (e.g., \"Find contradictions between these 10 legal contracts\"). Long Context is the \"Working Memory\" approach.<br/><br/><strong>The Verdict:</strong> RAG is not dead; it is evolving into an optimization layer. Long Context is for deep reasoning; RAG is for broad retrieval.",
+      toc: ["Quick Answer", "The Debate", "Economics", "Latency", "Accuracy", "Decision Matrix", "Hybrid", "FAQ"],
+      sections: [
+         {
+            id: "debate",
+            title: "The Debate: Is RAG Dead?",
+            content: (
+               <>
+                  <p>For years, RAG was the only way to give an LLM knowledge. You chunked documents, embedded them in a Vector Database (like Pinecone or Milvus), and retrieved the top 5 relevant chunks to feed the model.</p>
+                  <p>Then came Gemini 1.5 Pro (2 Million tokens) and Claude 3.5 (200k+ tokens). Suddenly, you could fit the entire Harry Potter series, a full codebase, or a year’s worth of financial filings into a single prompt.</p>
+                  <div className="p-4 bg-accent/5 border-l-2 border-accent my-6">
+                     <p className="font-serif text-lg italic text-ink">This sparked a narrative: "RAG is dead. Just dump it all in the context window."</p>
+                  </div>
+                  <p>In reality, engineering is never about "better," it is about trade-offs. While Long Context solves the "lost in the middle" problem, it introduces new bottlenecks in Latency and Compute Cost.</p>
+               </>
+            )
+         },
+         {
+            id: "economics",
+            title: "The Economics: Cost Analysis",
+            content: (
+               <>
+                  <p>This is where the battle is usually won or lost.</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                     <div className="p-5 bg-white/40 border border-ink/10 rounded-sm">
+                        <h4 className="font-bold text-ink mb-2">1. The Long Context Cost Model</h4>
+                        <p className="text-sm mb-3">Long context models charge you per input token.</p>
+                        <div className="bg-ink/5 p-3 rounded text-xs text-ink-muted mb-3 space-y-1">
+                           <p><strong>Scenario:</strong> 1,000-page manual (500k tokens).</p>
+                           <p><strong>Action:</strong> Put the whole manual in the prompt.</p>
+                           <p><strong>Cost:</strong> Pay for 500k tokens <em>every single query</em>.</p>
+                           <p className="text-red-600 font-bold">Total: ~$1.25 per question.</p>
+                        </div>
+                        <p className="text-xs text-ink-muted"><strong>Mitigation:</strong> Context Caching (pays a storage fee to keep memory loaded).</p>
+                     </div>
+                     <div className="p-5 bg-white/40 border border-ink/10 rounded-sm">
+                        <h4 className="font-bold text-ink mb-2">2. The RAG Cost Model</h4>
+                        <p className="text-sm mb-3">RAG separates storage from compute.</p>
+                        <div className="bg-ink/5 p-3 rounded text-xs text-ink-muted mb-3 space-y-1">
+                           <p><strong>Scenario:</strong> Same 1,000-page manual.</p>
+                           <p><strong>Action:</strong> Retrieve only 3 relevant pages (1k tokens).</p>
+                           <p><strong>Cost:</strong> Vector DB storage + 1k tokens.</p>
+                           <p className="text-green-600 font-bold">Total: ~$0.0025 per question.</p>
+                        </div>
+                        <p className="text-xs text-ink-muted"><strong>Winner:</strong> RAG wins for high-volume transactions.</p>
+                     </div>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "latency",
+            title: "The Physics: Latency & Pre-fill",
+            content: (
+               <>
+                  <p>Time-to-First-Token (TTFT) is the metric that kills user experience.</p>
+                  <h4 className="font-bold text-ink mt-6 mb-2">Long Context Latency</h4>
+                  <p>When you send 1 million tokens to Gemini, the model must process (read) all of them before it generates the first word. This is called the <strong>Pre-fill phase</strong>. Even with hardware acceleration, processing 1M tokens can take 10 to 60 seconds.</p>
+                  <p className="text-sm text-ink-muted mt-2"><em>User Experience: The user stares at a spinner for a minute.</em></p>
+
+                  <h4 className="font-bold text-ink mt-6 mb-2">RAG Latency</h4>
+                  <ul className="list-disc list-inside space-y-1 text-ink-muted">
+                     <li>Retrieval step: 50–100ms.</li>
+                     <li>Inference step (reading 2k tokens): 500ms.</li>
+                  </ul>
+                  <p className="text-sm text-ink-muted mt-2"><em>User Experience: Instant answer.</em></p>
+
+                  <div className="mt-6 p-4 bg-alt/10 border-l-2 border-ink/20">
+                     <span className="font-bold text-ink">Winner:</span> RAG is mandatory for real-time applications (Chatbots). Long Context is acceptable for background, asynchronous workflows.
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "accuracy",
+            title: "The Brain: Accuracy & Reasoning",
+            content: (
+               <>
+                  <p>This is where Long Context shines.</p>
+                  <div className="space-y-6 mt-6">
+                     <div>
+                        <h4 className="font-bold text-ink text-lg mb-2">The "Needle in a Haystack" Test (NIAH)</h4>
+                        <p>Long Context models have achieved nearly 100% recall. If you hide a secret code in the middle of a 2M token prompt, Gemini will find it.</p>
+                     </div>
+                     <div>
+                        <h4 className="font-bold text-ink text-lg mb-2">The "Global Reasoning" Problem</h4>
+                        <p className="mb-2"><strong>Prompt:</strong> "Summarize the major themes of this book."</p>
+                        <ul className="list-disc list-inside space-y-2 text-sm text-ink-muted">
+                           <li><span className="text-red-500 font-bold">RAG Failure:</span> Retrieves 5 random chunks. Cannot summarize the whole because it can't see the whole.</li>
+                           <li><span className="text-green-600 font-bold">Long Context Success:</span> Reads every word and synthesizes a perfect summary.</li>
+                        </ul>
+                     </div>
+                     <div>
+                        <h4 className="font-bold text-ink text-lg mb-2">The "Multi-Hop" Problem</h4>
+                        <p className="mb-2"><strong>Prompt:</strong> "Compare revenue growth in 2023 (Page 10) with risk factors in 2021 (Page 300)."</p>
+                        <p className="text-sm text-ink-muted">RAG often fails to fetch the second page because keywords don't match. Long Context sees both pages simultaneously and connects the dots.</p>
+                     </div>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "decision-matrix",
+            title: "Decision Matrix: When to Use Which",
+            content: (
+               <div className="my-8 overflow-x-auto">
+                  <table className="w-full text-sm text-left border-collapse">
+                     <thead>
+                        <tr className="border-b border-ink/10">
+                           <th className="py-2 font-bold text-ink">Feature</th>
+                           <th className="py-2 font-bold text-ink">RAG</th>
+                           <th className="py-2 font-bold text-ink">Long Context (1M+)</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr className="border-b border-ink/5">
+                           <td className="py-2 text-ink-muted">Dataset Size</td>
+                           <td className="py-2 text-ink-muted">Infinite (The Internet)</td>
+                           <td className="py-2 text-ink-muted">Limited (Fits in RAM)</td>
+                        </tr>
+                        <tr className="border-b border-ink/5">
+                           <td className="py-2 text-ink-muted">Data Updates</td>
+                           <td className="py-2 text-ink-muted">Real-time</td>
+                           <td className="py-2 text-ink-muted">Static (Re-cache needed)</td>
+                        </tr>
+                        <tr className="border-b border-ink/5">
+                           <td className="py-2 text-ink-muted">Query Cost</td>
+                           <td className="py-2 text-ink-muted">Very Low ($0.001)</td>
+                           <td className="py-2 text-ink-muted">High (unless Cached)</td>
+                        </tr>
+                        <tr className="border-b border-ink/5">
+                           <td className="py-2 text-ink-muted">Latency</td>
+                           <td className="py-2 text-ink-muted">Sub-second</td>
+                           <td className="py-2 text-ink-muted">Seconds to Minutes</td>
+                        </tr>
+                        <tr>
+                           <td className="py-2 text-ink-muted">Best For</td>
+                           <td className="py-2 text-ink-muted">Fact-checking, Search</td>
+                           <td className="py-2 text-ink-muted">Code Auditing, Discovery</td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+            )
+         },
+         {
+            id: "hybrid",
+            title: "The Third Way: Hybrid Architectures",
+            content: (
+               <>
+                  <p>Sophisticated teams in 2025 rarely choose just one. They use <strong>RAG-to-Long-Context</strong>.</p>
+                  <div className="bg-white/50 border border-ink/10 p-6 rounded-sm mt-6">
+                     <h4 className="font-bold text-ink mb-4">The Workflow</h4>
+                     <ol className="list-decimal list-inside space-y-3 text-sm text-ink-muted">
+                        <li><strong>Broad Search (RAG):</strong> User asks a vague question about a 100GB database.</li>
+                        <li><strong>Filter:</strong> RAG retrieves the top 50 documents (instead of the usual 3).</li>
+                        <li><strong>Context Stuffing:</strong> These 50 docs (approx 100k tokens) are stuffed into a Long Context window.</li>
+                        <li><strong>Reasoning:</strong> The LLM performs deep reasoning over this filtered subset.</li>
+                     </ol>
+                     <p className="mt-4 text-sm italic">This balances cost and accuracy. You don't pay to load the whole database, but you give the model enough context to perform multi-hop reasoning.</p>
+                  </div>
+               </>
+            )
+         }
+      ],
+      faqs: [
+         { question: "Does Long Context eliminate hallucinations?", answer: "No, but it reduces them compared to RAG. In RAG, if the retrieval step fetches the wrong document, the hallucination is guaranteed. In Long Context, the model has the correct data, but might still 'misread' it if the prompt is ambiguous." },
+         { question: "What is Context Caching?", answer: "A feature (in Gemini/Anthropic) where you upload a file once and it is stored in GPU memory. You pay a rental fee, but subsequent queries are faster and cheaper because the model doesn't re-read the file." },
+         { question: "Can I use Long Context for coding?", answer: "Yes, it is the best use case. You can upload an entire repo. However, for massive monolithic repos, a hybrid 'RAG for file search + Context for active files' is the standard IDE architecture (e.g., Cursor, GitHub Copilot)." }
       ]
    }
 };
