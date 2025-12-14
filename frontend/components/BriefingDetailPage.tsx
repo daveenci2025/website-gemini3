@@ -8,6 +8,11 @@ import AgenticWorkflowImage from '../images/001 - What is an Agentic Workflow.jp
 import SyntheticDataImage from '../images/002 - Synthetic Data Pipelines.jpg';
 import ZeroTouchCRMImage from '../images/003 - Zero-Touch CRM.jpg';
 import RagVsContextImage from '../images/004 - RAG vs. Long Context.jpg';
+import LocalLLMImage from '../images/005 - Local LLM Stack 2025.jpg';
+import PromptPatternsImage from '../images/006 - Prompt Engineering Patterns.jpg';
+import ComplianceImage from '../images/007 - AI Legal Compliance.jpg';
+import SaaSPricingImage from '../images/008 - The Death of SaaS Pricing.jpg';
+import AutomatedVideoImage from '../images/009 - Automated Video Prod.jpg';
 
 interface BriefingDetailPageProps {
    onNavigate: (page: Page, hash?: string, id?: string) => void;
@@ -797,6 +802,794 @@ const briefings: Record<string, BriefingData> = {
          { question: "Does Long Context eliminate hallucinations?", answer: "No, but it reduces them compared to RAG. In RAG, if the retrieval step fetches the wrong document, the hallucination is guaranteed. In Long Context, the model has the correct data, but might still 'misread' it if the prompt is ambiguous." },
          { question: "What is Context Caching?", answer: "A feature (in Gemini/Anthropic) where you upload a file once and it is stored in GPU memory. You pay a rental fee, but subsequent queries are faster and cheaper because the model doesn't re-read the file." },
          { question: "Can I use Long Context for coding?", answer: "Yes, it is the best use case. You can upload an entire repo. However, for massive monolithic repos, a hybrid 'RAG for file search + Context for active files' is the standard IDE architecture (e.g., Cursor, GitHub Copilot)." }
+      ]
+   },
+   "local-llm-stack": {
+      id: "local-llm-stack",
+      title: "Local LLM Stack 2025: Running Llama 4 for Legal Ops",
+      metaDescription: "Running Llama 4 locally for privacy-focused legal analysis. Hardware specs and inference engines reviewed.",
+      publishDate: "2025-12-07",
+      author: "Leonardo & Team",
+      category: "Architecture",
+      readTime: "14 min read",
+      issueNo: "040",
+      image: LocalLLMImage,
+      quickAnswerTitle: "What is the best stack for local Legal AI in 2025?",
+      quickAnswer: "To run Llama 4 (70B) locally for reviewing sensitive legal documents without data egress, the industry standard is the **Apple Silicon Stack**:<br/><br/><strong>Hardware:</strong> Mac Studio (M4 Ultra) with at least 128GB Unified Memory.<br/><strong>Model:</strong> Llama-4-70B-Instruct (Quantized to Q4_K_M or Q5_K_M).<br/><strong>Engine:</strong> Ollama (for backend management) or MLX (for native Apple optimization).<br/><strong>Interface:</strong> Open WebUI (creates a ChatGPT-like experience).<br/><strong>Cost:</strong> ~$5,000 one-time hardware cost. $0 monthly subscription.<br/><br/>This setup allows for analyzing 500+ page PDFs with full privacy, zero latency, and no API costs.",
+      toc: ["Mandate", "The Model", "Hardware", "Software Stack", "RAG Pipeline", "FAQ"],
+      sections: [
+         {
+            id: "mandate",
+            title: "The Mandate: Why \"Air-Gapped\" Legal AI?",
+            content: (
+               <>
+                  <p>By late 2025, the \"SaaS Fatigue\" in the legal sector has hit a peak. While tools like Harvey and Casetext are powerful, they require sending client data to the cloud. For high-stakes M&A, patent litigation, and criminal defense, <strong>Data Sovereignty</strong> is not a feature; it is an ethical requirement.</p>
+                  <div className="bg-alt/10 p-6 rounded-sm border border-ink/5 mt-6">
+                     <h4 className="font-bold text-ink mb-2">The \"Air-Gapped\" Advantage:</h4>
+                     <ul className="list-disc list-inside space-y-2 text-ink-muted">
+                        <li><strong>Privilege Protection:</strong> If the data never leaves the building, it cannot be intercepted or subpoenaed from a third-party provider.</li>
+                        <li><strong>GDPR/CCPA Compliance:</strong> Processing PII locally removes the complexity of cross-border data transfer agreements.</li>
+                        <li><strong>Cost Control:</strong> Instead of paying $30/user/month + token fees, you pay for electricity.</li>
+                     </ul>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "model",
+            title: "The Model: Llama 4 & The Reasoning Shift",
+            content: (
+               <>
+                  <p>Released in mid-2025, Llama 4 changed the landscape by introducing native System 2 Reasoning (similar to OpenAI's o1 series) into open weights.</p>
+                  <h4 className="font-bold text-ink mt-6 mb-4">Which version should you run?</h4>
+                  <div className="overflow-x-auto">
+                     <table className="w-full text-sm text-left border-collapse">
+                        <thead>
+                           <tr className="border-b border-ink/10">
+                              <th className="py-2 font-bold text-ink">Model Size</th>
+                              <th className="py-2 font-bold text-ink">Use Case</th>
+                              <th className="py-2 font-bold text-ink">Hardware Requirement</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           <tr className="border-b border-ink/5">
+                              <td className="py-2 text-ink-muted font-bold">Llama 4 (8B)</td>
+                              <td className="py-2 text-ink-muted">Email drafting, basic summarization.</td>
+                              <td className="py-2 text-ink-muted">Runs on any modern laptop (16GB RAM).</td>
+                           </tr>
+                           <tr className="border-b border-ink/5 bg-accent/5">
+                              <td className="py-2 text-ink font-bold">Llama 4 (70B)</td>
+                              <td className="py-2 text-ink">The Legal Standard. Contract analysis, reasoning.</td>
+                              <td className="py-2 text-ink">Requires 48GB+ VRAM/RAM.</td>
+                           </tr>
+                           <tr>
+                              <td className="py-2 text-ink-muted font-bold">Llama 4 (405B)</td>
+                              <td className="py-2 text-ink-muted">Complex multi-jurisdictional research.</td>
+                              <td className="py-2 text-ink-muted">Enterprise Servers (H200s) or clustered Macs.</td>
+                           </tr>
+                        </tbody>
+                     </table>
+                  </div>
+                  <div className="mt-6 p-4 border border-ink/10 rounded-sm">
+                     <h4 className="font-bold text-ink mb-2">The \"Quantization\" Factor</h4>
+                     <p className="text-sm text-ink-muted">You do not need to run the full, uncompressed model.</p>
+                     <ul className="list-disc list-inside mt-2 text-sm text-ink-muted">
+                        <li><strong>FP16 (Full Precision):</strong> Requires ~140GB VRAM for 70B. (Overkill).</li>
+                        <li><strong>Q4_K_M (4-bit Quantization):</strong> Requires ~42GB VRAM.</li>
+                     </ul>
+                     <p className="mt-2 text-sm font-bold text-green-700">Verdict: At Q4, the model retains 99% of its reasoning ability but fits on consumer hardware.</p>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "hardware",
+            title: "Hardware: The \"VRAM Wall\" & Recommendations",
+            content: (
+               <>
+                  <p>To run local AI, the bottleneck is not the speed of the chip; it is the <strong>Memory Bandwidth and Capacity</strong>.</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                     <div className="p-6 bg-white/50 border border-ink/10 rounded-sm">
+                        <h4 className="font-bold text-ink mb-2">Option A: The Gold Standard (Apple Silicon)</h4>
+                        <p className="text-sm text-ink-muted mb-4">Apple remains the king of local inference because of Unified Memory Architecture (UMA).</p>
+                        <ul className="space-y-2 text-sm">
+                           <li><strong>Recommended:</strong> Mac Studio M4 Ultra (128GB RAM).</li>
+                           <li><strong>Why:</strong> Loads Llama-4-70B (42GB) with 80GB left for a massive 200k token context window.</li>
+                        </ul>
+                     </div>
+                     <div className="p-6 bg-white/50 border border-ink/10 rounded-sm">
+                        <h4 className="font-bold text-ink mb-2">Option B: The PC Enthusiast (Nvidia)</h4>
+                        <p className="text-sm text-ink-muted mb-4">If you are building a Linux server.</p>
+                        <ul className="space-y-2 text-sm">
+                           <li><strong>Recommended:</strong> Dual RTX 5090s (2x 32GB = 64GB).</li>
+                           <li><strong>Note:</strong> Single cards cap at 32GB, insufficient for 70B. Requires "Tensor Parallelism".</li>
+                        </ul>
+                     </div>
+                  </div>
+                  <div className="mt-6 p-4 bg-alt/10 border-l-2 border-ink/20">
+                     <h4 className="font-bold text-ink text-sm">Option C: The Distributed Fleet (Exo)</h4>
+                     <p className="text-sm text-ink-muted">A rising trend in 2025. Stitch three MacBook Pros (M3 Max) together over Wi-Fi/LAN to run the massive 405B model.</p>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "software",
+            title: "The Software Stack: Engines & UI",
+            content: (
+               <>
+                  <p>Don't use the command line. The 2025 stack is user-friendly.</p>
+                  <div className="space-y-4 mt-6">
+                     <div className="flex gap-4">
+                        <div className="w-8 h-8 rounded-full bg-ink text-white flex items-center justify-center font-bold flex-shrink-0">1</div>
+                        <div>
+                           <h4 className="font-bold text-ink">The Engine: Ollama</h4>
+                           <p className="text-sm text-ink-muted">The "Docker of AI." One-click install. Model management via <code>ollama run llama4:70b</code>.</p>
+                        </div>
+                     </div>
+                     <div className="flex gap-4">
+                        <div className="w-8 h-8 rounded-full bg-ink text-white flex items-center justify-center font-bold flex-shrink-0">2</div>
+                        <div>
+                           <h4 className="font-bold text-ink">The Interface: Open WebUI</h4>
+                           <p className="text-sm text-ink-muted">Polished interface identical to ChatGPT. Supports document upload ("The Jones Case") with auto-chunking.</p>
+                        </div>
+                     </div>
+                     <div className="flex gap-4">
+                        <div className="w-8 h-8 rounded-full bg-ink text-white flex items-center justify-center font-bold flex-shrink-0">3</div>
+                        <div>
+                           <h4 className="font-bold text-ink">The Backend (Advanced): vLLM</h4>
+                           <p className="text-sm text-ink-muted">For deployments with 50+ concurrent users. Requires Linux Docker container but offers higher throughput.</p>
+                        </div>
+                     </div>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "rag",
+            title: "The RAG Pipeline: Talking to Case Files",
+            content: (
+               <>
+                  <p>Running the model is step one. Step two is giving it memory using a <strong>Local RAG (Retrieval Augmented Generation)</strong> setup.</p>
+                  <div className="bg-white/50 p-6 rounded-sm border border-ink/5 mt-6">
+                     <h4 className="font-bold text-ink mb-4">The Workflow:</h4>
+                     <ol className="list-decimal list-inside space-y-3 font-medium text-ink">
+                        <li><strong>Ingestion:</strong> Unstructured.io parses PDFs, strips headers, and OCRs images.</li>
+                        <li><strong>Vector Store:</strong> ChromaDB runs locally, storing the "mathematical meaning" of documents.</li>
+                        <li><strong>Retrieval:</strong> Lawyer asks a question &rarr; RAG fetches top 10 relevant pages.</li>
+                        <li><strong>Generation:</strong> Llama 4 analyzes those 10 pages and drafts the memo.</li>
+                     </ol>
+                  </div>
+                  <div className="mt-4 p-4 text-sm bg-orange-50 text-orange-900 border border-orange-100 rounded-sm flex gap-2">
+                     <Lightbulb className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                     <span><strong>Tip:</strong> Ensure your RAG pipeline uses Hybrid Search (Keyword + Semantic). Legal documents often hinge on specific dates or names (Keyword) which semantic search sometimes misses.</span>
+                  </div>
+               </>
+            )
+         }
+      ],
+      faqs: [
+         { question: "Is Llama 4 truly private?", answer: "The model weights are public, but the inference is private. If you pull the internet cable out of your Mac Studio, the model still works. No data leaves the machine." },
+         { question: "Can Llama 4 write a motion to dismiss?", answer: "It can draft a very strong first pass. Llama 4 (70B) is roughly equivalent to GPT-4o in reasoning. However, it requires human review (Human-in-the-Loop) for case citations, as hallucinations can still occur." },
+         { question: "What is the cost of electricity?", answer: "Running a Mac Studio M4 Ultra at full load draws ~300W. Running dual RTX 5090s draws ~1000W. For occasional queries, the cost is negligible. For 24/7 batch processing, the Mac is significantly cheaper to operate." },
+         { question: "Why not just use Microsoft Copilot?", answer: "Copilot logs data for \"safety monitoring\" and enterprise improvement (unless you have a strict negotiated contract). For criminal defense or IP litigation, the risk of any third-party logging is often unacceptable." }
+      ]
+   },
+   "prompt-patterns": {
+      id: "prompt-patterns",
+      title: "Prompt Engineering Patterns: Beyond Chain of Thought",
+      metaDescription: "Moving beyond 'Chain of Thought'. Implementing 'Tree of Thoughts' and recursive criticism for complex reasoning tasks.",
+      publishDate: "2025-12-07",
+      author: "Leonardo & Team",
+      category: "Strategy",
+      readTime: "16 min read",
+      issueNo: "039",
+      image: PromptPatternsImage,
+      quickAnswerTitle: "What is the difference between Chain of Thought and Tree of Thoughts?",
+      quickAnswer: "**Chain of Thought (CoT)** is a linear reasoning method (\"Let's think step by step\") where the model follows a single path A → B → C. It is efficient but brittle; if one step is wrong, the final answer fails.<br/><br/>**Tree of Thoughts (ToT)** is a non-linear method where the model generates multiple possible \"branches\" of reasoning for each step, evaluates them (self-voting), and discards the bad paths. It mimics human brainstorming and is 70-80% more effective for complex planning, coding, and creative writing.",
+      toc: ["Evolution", "Pattern 1: ToT", "Pattern 2: RCI", "Pattern 3: CoD", "Pattern 4: Maieutic", "Automation: DSPy", "FAQ"],
+      sections: [
+         {
+            id: "evolution",
+            title: "The Evolution: From Magic Words to Cognitive Architectures",
+            content: (
+               <>
+                  <p>In 2023, \"Prompt Engineering\" was often derided as \"whispering to the machine.\" By 2025, it has evolved into <strong>Cognitive Architecture Design</strong>.</p>
+                  <p>We are no longer searching for the perfect phrase. We are structuring the flow of computation. Advanced patterns like ToT and RCI are designed to break \"tunnel vision\" by forcing <strong>Inference-Time Compute</strong>—trading speed for accuracy.</p>
+                  <div className="my-8 overflow-x-auto">
+                     <table className="w-full text-sm text-left border-collapse">
+                        <thead>
+                           <tr className="border-b border-ink/10">
+                              <th className="py-2 font-bold text-ink">Pattern</th>
+                              <th className="py-2 font-bold text-ink">Topology</th>
+                              <th className="py-2 font-bold text-ink">Best Use Case</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           <tr className="border-b border-ink/5">
+                              <td className="py-2 text-ink-muted">Chain of Thought (CoT)</td>
+                              <td className="py-2 text-ink-muted">Linear (A→B→C)</td>
+                              <td className="py-2 text-ink-muted">Math, simple logic</td>
+                           </tr>
+                           <tr className="border-b border-ink/5">
+                              <td className="py-2 text-ink-muted">Tree of Thoughts (ToT)</td>
+                              <td className="py-2 text-ink-muted">Branching (A→B1/B2/B3→C)</td>
+                              <td className="py-2 text-ink-muted">Strategy, coding, creative</td>
+                           </tr>
+                           <tr>
+                              <td className="py-2 text-ink-muted">Graph of Thoughts (GoT)</td>
+                              <td className="py-2 text-ink-muted">Networked (A+B → C)</td>
+                              <td className="py-2 text-ink-muted">Aggregating research</td>
+                           </tr>
+                        </tbody>
+                     </table>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "tot",
+            title: "Pattern 1: Tree of Thoughts (ToT)",
+            content: (
+               <>
+                  <h4 className="font-bold text-ink mb-2">The Concept</h4>
+                  <p className="mb-4">Humans don't just think linearly. When planning a move in chess, we explore multiple options using \"If/Then\" scenarios. ToT forces the LLM to do the same.</p>
+                  <div className="bg-alt/10 p-6 rounded-sm border border-ink/5">
+                     <h4 className="font-bold text-ink mb-2">The \"System Prompt\" Template:</h4>
+                     <p className="font-mono text-xs text-ink-muted whitespace-pre-wrap">
+                        "Imagine three different experts are answering this question.<br />
+                        All experts will write down 1 step of their thinking, then share it with the group.<br />
+                        Then, all experts will critique each other's step and decide which path is the most promising.<br />
+                        If a path is flawed, they must discard it and start a new branch.<br />
+                        Continue this process until a consensus is reached."
+                     </p>
+                  </div>
+                  <p className="mt-4 text-sm text-ink-muted"><strong>Why it works:</strong> It forces the model to generate diverse perspectives and perform a "majority vote" on its own logic before committing.</p>
+               </>
+            )
+         },
+         {
+            id: "rci",
+            title: "Pattern 2: Recursive Criticism & Improvement (RCI)",
+            content: (
+               <>
+                  <h4 className="font-bold text-ink mb-2">The Concept</h4>
+                  <p className="mb-4">LLMs are often better at spotting errors than avoiding them. RCI asks the model to act as its own editor (Reflexion Loop).</p>
+                  <ul className="list-decimal list-inside space-y-2 bg-white/50 p-6 rounded-sm border border-ink/5">
+                     <li><strong>Draft:</strong> Model generates a response.</li>
+                     <li><strong>Critique:</strong> "Review the previous response for security vulnerabilities, logic gaps, or tone inconsistencies."</li>
+                     <li><strong>Refine:</strong> "Rewrite the response strictly following the critique."</li>
+                  </ul>
+                  <p className="mt-4 text-sm text-green-700 font-bold">Result: Improves coding accuracy on HumanEval by over 30%.</p>
+               </>
+            )
+         },
+         {
+            id: "density",
+            title: "Pattern 3: Chain of Density (CoD)",
+            content: (
+               <>
+                  <p>Standard summaries are often \"lossy\". Chain of Density is a recursive technique to pack more entities into a fixed-length summary.</p>
+                  <div className="mt-4 p-4 border border-ink/10 rounded-sm">
+                     <h4 className="font-bold text-ink mb-2">The Algorithm:</h4>
+                     <ol className="list-decimal list-inside space-y-1 text-sm text-ink-muted">
+                        <li>Write a sparse summary.</li>
+                        <li>Identify "Missing Entities" (facts/names left out).</li>
+                        <li>Rewrite the summary without increasing the length, fusing the missing entities.</li>
+                        <li>Repeat 3-5 times.</li>
+                     </ol>
+                  </div>
+                  <p className="mt-2 text-sm italic">Best For: Creating high-signal executive briefings or newsletters.</p>
+               </>
+            )
+         },
+         {
+            id: "maieutic",
+            title: "Pattern 4: Maieutic Prompting (Socratic)",
+            content: (
+               <>
+                  <p>Named after the Socratic method, this pattern helps the model handle Ambiguity. If a user asks a vague question, a standard LLM guesses. A Maieutic agent asks clarifying questions.</p>
+                  <div className="bg-alt/10 p-6 rounded-sm border border-ink/5 mt-4">
+                     <h5 className="font-bold text-xs uppercase tracking-widest mb-2">The Template:</h5>
+                     <p className="text-sm italic">"I will ask a question. If the answer depends on conditions, do not answer directly.<br />Instead: Identify ambiguity. Propose a tree of logical explanations ('If A, then X'). Assess contradictions."</p>
+                  </div>
+                  <p className="mt-2 text-sm"><strong>Best For:</strong> Legal analysis, Logical dilemmas, and Medical diagnosis.</p>
+               </>
+            )
+         },
+         {
+            id: "dspy",
+            title: "Automating the Patterns: DSPy & DSP",
+            content: (
+               <>
+                  <p>By 2025, writing complex prompt chains by hand is considered brittle. The industry has moved toward <strong>DSPy</strong> (Declarative Self-Improving Language Programs).</p>
+                  <h4 className="font-bold text-ink mt-6 mb-2">What is DSPy?</h4>
+                  <p>Instead of writing text prompts ("You are a helpful assistant..."), you write Python code that compiles into prompts.</p>
+                  <ul className="list-disc list-inside space-y-2 mt-4 text-sm bg-white/50 p-4 border border-ink/10 rounded-sm">
+                     <li>You define a module: <code>ChainOfThought("question &rarr; answer")</code>.</li>
+                     <li>You give it examples (Few-Shot).</li>
+                     <li>The <strong>Compiler</strong> optimizes the prompt for you. It tests 1,000 variations against a metric and selects the best one.</li>
+                  </ul>
+                  <p className="mt-4 text-sm"><strong>Benefit:</strong> If you switch models (GPT-4 to Llama-3), DSPy recompiles the prompts to fit the new model automatically.</p>
+               </>
+            )
+         }
+      ],
+      faqs: [
+         { question: "Does OpenAI's o1 (Strawberry) make this obsolete?", answer: "OpenAI's o1 model performs 'Chain of Thought' internally. However, for Open Source models (Llama 4) or for granular control over logic, you still need to implement these patterns explicitly." },
+         { question: "How much does Tree of Thoughts cost?", answer: "It is expensive. Generating 9 intermediate thoughts increases token usage by 10x. Use it only for high-value tasks." },
+         { question: "Can I use these patterns in ChatGPT Plus?", answer: "Yes. You can paste the 'System Prompts' provided above into a Custom Instruction to force the model into these reasoning modes." },
+         { question: "What is 'Skeleton-of-Thought'?", answer: "A latency-optimization pattern. You ask the model to first write an outline, then use parallel API calls to fill in each section simultaneously." }
+      ]
+   },
+   "ai-compliance": {
+      id: "ai-compliance",
+      title: "AI Legal Compliance: Navigating the EU AI Act while Shipping Fast",
+      metaDescription: "Navigating the EU AI Act while shipping fast. Practical checklists for automated decision-making systems.",
+      publishDate: "2025-12-07",
+      author: "Leonardo & Team",
+      category: "Strategy",
+      readTime: "12 min read",
+      issueNo: "038",
+      image: ComplianceImage,
+      quickAnswerTitle: "How to ship fast without getting fined?",
+      quickAnswer: "The EU AI Act is fully enforceable as of mid-2025. It applies to anyone placing an AI system on the EU market. To ship fast without getting fined:<br/><br/><strong>Adopt \"Compliance by Design\":</strong> Use automated tools to generate Model Cards, track Data Lineage, and enforce Human-in-the-Loop protocols for high-risk decisions. Do not treat compliance as a final legal review; treat it as part of your CI/CD pipeline.",
+      toc: ["Landscape", "Risk Pyramid", "High Risk", "Checklist", "Technical", "Penalties", "FAQ"],
+      sections: [
+         {
+            id: "landscape",
+            title: "The Landscape: The \"Brussels Effect\" in 2025",
+            content: (
+               <>
+                  <p>By December 2025, the grace periods for the EU AI Act have largely expired. The European AI Office is active, and the first fines are being processed. Just as GDPR became the global standard for privacy, the EU AI Act has become the global standard for model safety.</p>
+                  <div className="bg-alt/10 p-6 rounded-sm border border-ink/5 mt-6">
+                     <h4 className="font-bold text-ink mb-2">The \"SaaS Trap\"</h4>
+                     <p className="text-sm text-ink-muted">Many developers assume they are safe because they just "wrap" OpenAI. <strong>Reality Check:</strong> If you wrap GPT-4 to build a "Candidate Screening Tool," YOU are the "Provider" of a High-Risk system under the Act. You inherit the liability, not OpenAI.</p>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "risk-pyramid",
+            title: "The Risk Pyramid: Where does your tool fit?",
+            content: (
+               <>
+                  <p>Before writing code, you must classify your system. The regulations are binary based on this classification.</p>
+                  <div className="my-8 overflow-x-auto">
+                     <table className="w-full text-sm text-left border-collapse">
+                        <thead>
+                           <tr className="border-b border-ink/10">
+                              <th className="py-2 font-bold text-ink">Risk Level</th>
+                              <th className="py-2 font-bold text-ink">Examples</th>
+                              <th className="py-2 font-bold text-ink">Obligations</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           <tr className="border-b border-ink/5 bg-red-50">
+                              <td className="py-2 text-ink font-bold">Unacceptable (Banned)</td>
+                              <td className="py-2 text-ink-muted">Social Scoring, Emotion Recognition in Schools.</td>
+                              <td className="py-2 text-ink-muted">Do Not Build. Immediate withdrawal.</td>
+                           </tr>
+                           <tr className="border-b border-ink/5 bg-orange-50">
+                              <td className="py-2 text-ink font-bold">High Risk</td>
+                              <td className="py-2 text-ink-muted">Resume scanners, Credit scoring, Medical Devices.</td>
+                              <td className="py-2 text-ink-muted">Heavy Compliance. Conformity assessment.</td>
+                           </tr>
+                           <tr className="border-b border-ink/5">
+                              <td className="py-2 text-ink font-bold">Limited Risk</td>
+                              <td className="py-2 text-ink-muted">Chatbots, Image generators.</td>
+                              <td className="py-2 text-ink-muted">Transparency. "You are talking to an AI."</td>
+                           </tr>
+                           <tr>
+                              <td className="py-2 text-ink font-bold">Minimal Risk</td>
+                              <td className="py-2 text-ink-muted">Spam filters, Video games.</td>
+                              <td className="py-2 text-ink-muted">None.</td>
+                           </tr>
+                        </tbody>
+                     </table>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "high-risk",
+            title: "Focus: Automated Decision-Making (High-Risk Systems)",
+            content: (
+               <>
+                  <p>If you are building \"Automated Decision-Making\" (ADM) systems, you are likely in the High-Risk category (Annex III of the Act).</p>
+                  <ul className="list-disc list-inside space-y-2 mt-4 bg-white/50 p-6 rounded-sm border border-ink/5">
+                     <li><strong>Employment:</strong> Tools that filter CVs or rank candidates.</li>
+                     <li><strong>Education:</strong> Proctoring software or grading algorithms.</li>
+                     <li><strong>Financial Services:</strong> Creditworthiness assessments.</li>
+                     <li><strong>Critical Infrastructure:</strong> Traffic control, water, or electricity grids.</li>
+                  </ul>
+                  <div className="mt-4 p-4 border-l-4 border-accent bg-accent/5">
+                     <p className="text-sm font-bold text-ink">The "Fundamental Rights" Test</p>
+                     <p className="text-sm text-ink-muted">If your AI says "No" to a human (No job, No loan, No university admission), it is High Risk.</p>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "checklist",
+            title: "The \"Ship Fast\" Checklist for Compliance",
+            content: (
+               <div className="space-y-6">
+                  <div>
+                     <h4 className="font-bold text-ink text-sm mb-1">Phase 1: Data Governance (Before Training)</h4>
+                     <ul className="list-disc list-inside text-sm text-ink-muted pl-2">
+                        <li><strong>Data Lineage:</strong> Trace training data back to source (DVC/Pachyderm).</li>
+                        <li><strong>Bias Audit:</strong> Test dataset for representational bias.</li>
+                        <li><strong>Copyright:</strong> Ensure legal right to use data.</li>
+                     </ul>
+                  </div>
+                  <div>
+                     <h4 className="font-bold text-ink text-sm mb-1">Phase 2: The Technical File (During Dev)</h4>
+                     <ul className="list-disc list-inside text-sm text-ink-muted pl-2">
+                        <li><strong>Model Card:</strong> Live document detailing limitations.</li>
+                        <li><strong>Logging:</strong> Automatically log Input/Output/Latency.</li>
+                        <li><strong>metrics:</strong> Document F1 Score, Precision, Recall.</li>
+                     </ul>
+                  </div>
+                  <div>
+                     <h4 className="font-bold text-ink text-sm mb-1">Phase 3: Human Oversight (Deployment)</h4>
+                     <ul className="list-disc list-inside text-sm text-ink-muted pl-2">
+                        <li><strong>The "Stop" Button:</strong> Capability to shut down immediately.</li>
+                        <li><strong>Human-in-the-Loop (HITL):</strong> AI outputs recommendation, human clicks "Approve."</li>
+                     </ul>
+                  </div>
+               </div>
+            )
+         },
+         {
+            id: "technical",
+            title: "Technical Implementation: Compliance as Code",
+            content: (
+               <>
+                  <p>Don't rely on lawyers to update Word documents. Automate compliance.</p>
+                  <div className="space-y-6 mt-6">
+                     <div className="p-4 bg-white/40 border border-ink/10 rounded-sm">
+                        <h4 className="font-bold text-ink mb-2">1. The Model Card Generator</h4>
+                        <p className="text-sm mb-2">Use <code>model-card-toolkit</code> to auto-generate reports.</p>
+                        <div className="bg-ink text-white p-3 rounded text-xs font-mono">
+                           with mlflow.start_run():<br />
+                           &nbsp;&nbsp;mlflow.log_param("data_version", "v2.1-GDPR-cleaned")<br />
+                           &nbsp;&nbsp;mlflow.log_metric("bias_disparity_index", 0.05)
+                        </div>
+                     </div>
+                     <div className="p-4 bg-white/40 border border-ink/10 rounded-sm">
+                        <h4 className="font-bold text-ink mb-2">2. Watermarking (for GenAI)</h4>
+                        <ul className="list-disc list-inside text-sm text-ink-muted">
+                           <li><strong>Images:</strong> Use C2PA standards to sign as "AI Generated."</li>
+                           <li><strong>Text:</strong> Add disclaimer: "I am an AI assistant."</li>
+                        </ul>
+                     </div>
+                     <div className="p-4 bg-white/40 border border-ink/10 rounded-sm">
+                        <h4 className="font-bold text-ink mb-2">3. Explainability (XAI)</h4>
+                        <p className="text-sm text-ink-muted">Use <strong>SHAP values</strong> to explain rejections. Legal Requirement: The user has a "Right to Explanation."</p>
+                     </div>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "penalties",
+            title: "Penalties & Enforcement",
+            content: (
+               <>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                     <div className="p-4 bg-red-50 border border-red-100 rounded-sm text-center">
+                        <div className="text-2xl font-bold text-red-800">35M &euro;</div>
+                        <div className="text-xs text-red-600 uppercase tracking-widest font-bold mt-1">Prohibited AI</div>
+                        <p className="text-xs text-ink-muted mt-2">or 7% of Global Turnover</p>
+                     </div>
+                     <div className="p-4 bg-orange-50 border border-orange-100 rounded-sm text-center">
+                        <div className="text-2xl font-bold text-orange-800">15M &euro;</div>
+                        <div className="text-xs text-orange-600 uppercase tracking-widest font-bold mt-1">High-Risk Violations</div>
+                        <p className="text-xs text-ink-muted mt-2">or 3% of Global Turnover</p>
+                     </div>
+                     <div className="p-4 bg-yellow-50 border border-yellow-100 rounded-sm text-center">
+                        <div className="text-2xl font-bold text-yellow-800">7.5M &euro;</div>
+                        <div className="text-xs text-yellow-600 uppercase tracking-widest font-bold mt-1">Misinformation</div>
+                        <p className="text-xs text-ink-muted mt-2">or 1.5% of Global Turnover</p>
+                     </div>
+                  </div>
+               </>
+            )
+         }
+      ],
+      faqs: [
+         { question: "I am a US company. Does this apply to me?", answer: "Yes. If your output is available to users in the EU, the Act applies. There is no 'Geoblocking' loophole if you actively market to the EU." },
+         { question: "What about Open Source?", answer: "If you release a model under an open license and do not monetize it, many obligations are waived. However, this exception does not apply if the model is Prohibited or High-Risk." },
+         { question: "Is 'General Purpose AI' (GPAI) High Risk?", answer: "Not automatically. GPAI models (like Llama 4) have their own tier. Typically they require technical docs and copyright compliance. 'Systemic Risk' models face stricter Red Teaming." },
+         { question: "How do I start?", answer: "Perform a Fundamental Rights Impact Assessment (FRIA). It asks: 'Could this AI hurt someone's safety or rights?' If yes, call legal." }
+      ]
+   },
+   "saas-pricing": {
+      id: "saas-pricing",
+      title: "The Death of SaaS Pricing: From \"Seats\" to \"Outcomes\"",
+      metaDescription: "Why 'per seat' pricing is dying and how to transition your AI product to 'outcome-based' billing models.",
+      publishDate: "2025-12-07",
+      author: "Leonardo & Team",
+      category: "Strategy",
+      readTime: "10 min read",
+      issueNo: "037",
+      image: SaaSPricingImage,
+      quickAnswerTitle: "Why is \"Per Seat\" pricing dying?",
+      quickAnswer: "\"Per Seat\" pricing ($30/user/month) assumes software is a tool used by humans. However, AI Agents are now performing the work instead of humans.<br/><br/>If your AI is successful, your customer will hire fewer humans. If they hire fewer humans, your revenue drops. Therefore, in an agentic world, seat-based pricing penalizes efficiency. The industry is shifting to **Outcome-Based Pricing** (charging per ticket resolved, per report written, or per lead qualified).",
+      toc: ["Crisis", "New Hierarchy", "Examples", "Strategy", "Tech Stack", "Risks", "FAQ"],
+      sections: [
+         {
+            id: "crisis",
+            title: "The Crisis: The Copilot Paradox",
+            content: (
+               <>
+                  <p>In 2025, we face the Copilot Paradox: You build an amazing AI Agent that automates 80% of the Legal Department's work. The client realizes they don't need 10 paralegals; they only need 2 paralegals and your AI.</p>
+                  <div className="p-4 bg-red-50 border border-red-100 rounded-sm mt-4">
+                     <p className="text-sm text-red-900 font-bold">Result: Your client saves millions, but your contract value drops from 10 seats to 2 seats. You effectively engineered your own revenue churn.</p>
+                  </div>
+                  <h4 className="font-bold text-ink mt-6 mb-2">The \"Service-as-Software\" Shift</h4>
+                  <p>Investors are no longer valuing AI companies based on \"User Adoption.\" They are valuing them on \"Service Total Addressable Market\" (Service TAM). You aren't competing with Microsoft Word ($10/month); you are competing with the Paralegal ($60,000/year). Your pricing must capture a slice of that labor value.</p>
+               </>
+            )
+         },
+         {
+            id: "hierarchy",
+            title: "The New Hierarchy: Usage vs. Outcome",
+            content: (
+               <>
+                  <p>If \"Seats\" are dead, what replaces them? There is a hierarchy of AI monetization.</p>
+                  <div className="space-y-6 mt-6">
+                     <div className="p-4 bg-white/40 border border-ink/10 rounded-sm">
+                        <h4 className="font-bold text-ink mb-1">Level 1: Usage-Based (Snowflake Model)</h4>
+                        <p className="text-sm mb-2">Metric: Per 1M Tokens, Per GPU Hour.</p>
+                        <p className="text-xs text-ink-muted"><strong>Cons:</strong> Customers hate this. It punishes them for using the product. It feels like leaving the lights on.</p>
+                     </div>
+                     <div className="p-4 bg-white/40 border border-ink/10 rounded-sm">
+                        <h4 className="font-bold text-ink mb-1">Level 2: Credit-Based (Adobe Model)</h4>
+                        <p className="text-sm mb-2">Metric: 500 \"Generations\" per month.</p>
+                        <p className="text-xs text-ink-muted"><strong>Cons:</strong> Friction. Users hesitate to click \"Generate\" because of hoarding mentality.</p>
+                     </div>
+                     <div className="p-4 bg-accent/5 border border-accent/20 rounded-sm">
+                        <h4 className="font-bold text-accent mb-1">Level 3: Outcome-Based (Agency Model)</h4>
+                        <p className="text-sm mb-2">Metric: Per Successful Resolution.</p>
+                        <p className="text-xs text-ink-muted"><strong>Philosophy:</strong> \"We don't get paid for trying; we get paid for doing.\"</p>
+                     </div>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "examples",
+            title: "Real-World Examples: Intercom & Salesforce",
+            content: (
+               <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                     <div className="p-4 border border-ink/10 rounded-sm">
+                        <h4 className="font-bold text-ink mb-2">Intercom (Fin AI)</h4>
+                        <p className="text-sm text-ink-muted"><strong>Price:</strong> $0.99 per resolution.</p>
+                        <p className="text-xs mt-2 text-ink-muted">The Hook: If the AI answers but the user still requests a human, you pay $0. Aligns incentives perfectly.</p>
+                     </div>
+                     <div className="p-4 border border-ink/10 rounded-sm">
+                        <h4 className="font-bold text-ink mb-2">Salesforce (Agentforce)</h4>
+                        <p className="text-sm text-ink-muted"><strong>Price:</strong> $2 per conversation.</p>
+                        <p className="text-xs mt-2 text-ink-muted">Logic: An Agent capable of handling unlimited conversations is worth far more than a single $300 seat.</p>
+                     </div>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "strategy",
+            title: "Strategy: Defining Your \"Atomic Unit of Work\"",
+            content: (
+               <>
+                  <p>To transition, you must identify your metric. This is called the Atomic Unit of Work.</p>
+                  <ul className="list-none space-y-4 mt-4">
+                     <li className="p-3 bg-white/50 border-l-2 border-ink/20">
+                        <strong className="block text-ink text-sm">Step 1: Identify the Deliverable</strong>
+                        <span className="text-xs text-ink-muted">Recruiting AI: Not "emails sent," but "Interview Scheduled."</span>
+                     </li>
+                     <li className="p-3 bg-white/50 border-l-2 border-ink/20">
+                        <strong className="block text-ink text-sm">Step 2: The \"Success\" Gate</strong>
+                        <span className="text-xs text-ink-muted">How do you verify quality? <strong>Implicit Acceptance:</strong> You charge if the user doesn't edit the output within 24 hours.</span>
+                     </li>
+                     <li className="p-3 bg-white/50 border-l-2 border-ink/20">
+                        <strong className="block text-ink text-sm">Step 3: The Hybrid Pricing</strong>
+                        <span className="text-xs text-ink-muted">Don't go cold turkey. Charge a Platform Fee ($500/mo) for stability + Work Fee ($5/action) for upside.</span>
+                     </li>
+                  </ul>
+               </>
+            )
+         },
+         {
+            id: "tech-stack",
+            title: "The Tech Stack: Billing Infrastructure",
+            content: (
+               <>
+                  <p>Stripe's default subscription model struggles with complex metering. You need specialized \"Metered Billing\" infrastructure.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                     <div className="p-3 border border-ink/10 text-center">
+                        <strong className="block text-accent mb-1">Orb</strong>
+                        <span className="text-xs text-ink-muted">Modern standard for flexible usage-based billing.</span>
+                     </div>
+                     <div className="p-3 border border-ink/10 text-center">
+                        <strong className="block text-accent mb-1">Metronome</strong>
+                        <span className="text-xs text-ink-muted">Scalable infra for enterprise pricing changes.</span>
+                     </div>
+                     <div className="p-3 border border-ink/10 text-center">
+                        <strong className="block text-accent mb-1">Lago</strong>
+                        <span className="text-xs text-ink-muted">Open-source alternative for metering.</span>
+                     </div>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "risks",
+            title: "Objections & Risk Mitigation",
+            content: (
+               <div className="space-y-6 mt-4">
+                  <div>
+                     <h4 className="font-bold text-ink text-sm mb-1">Objection: \"CFOs hate variable costs.\"</h4>
+                     <p className="text-sm text-ink-muted"><strong>Solution: Drawdown Drawers.</strong> Customer pre-pays $60k/year for 60,000 credits. They draw down against this balance. Predictable budget, variable usage.</p>
+                  </div>
+                  <div>
+                     <h4 className="font-bold text-ink text-sm mb-1">Objection: \"What if the AI loops?\"</h4>
+                     <p className="text-sm text-ink-muted"><strong>Solution: Circuit Breakers.</strong> "Your agent is capped at $50/day. We will pause and email you if it hits this limit."</p>
+                  </div>
+               </div>
+            )
+         }
+      ],
+      faqs: [
+         { question: "Does this apply to B2C?", answer: "No. Consumers prefer flat-rate (Netflix style). Outcome-based is primarily a B2B strategy where the output has a clear ROI." },
+         { question: "Should I charge for 'Thinking Time' (Inference)?", answer: "Generally, no. Customers don't care how hard the AI thought; they care about the result. If you optimize your model to be 50% faster, keep that margin." },
+         { question: "My AI isn't accurate enough yet. Can I use this?", answer: "No. If your success rate is below 80%, outcome-based pricing will bankrupt you. Stick to Seat or Usage pricing until your Agent is reliable." }
+      ]
+   },
+   "automated-video": {
+      id: "automated-video",
+      title: "Automated Video Prod: The Age of Hyper-Personalization",
+      metaDescription: "The age of hyper-personalization. Using Veo and Remotion to create 'segments of one' for sales outreach.",
+      publishDate: "2025-12-07",
+      author: "Leonardo & Team",
+      category: "Strategy",
+      readTime: "11 min read",
+      issueNo: "036",
+      image: AutomatedVideoImage,
+      quickAnswerTitle: "What is Automated Video Production?",
+      quickAnswer: "Automated Video Production (Programmatic Video) uses code and AI models to generate thousands of unique video assets without manual editing. By combining **Generative Video** (Google Veo), **Neural TTS** (ElevenLabs), and **Code-Based Rendering** (Remotion), companies can create \"segments of one.\"<br/><br/>Instead of sending a generic video to 1,000 prospects, you send 1,000 videos where the AI avatar speaks the prospect's name and shows their website.",
+      toc: ["Shift", "Tech Stack", "Architecture", "Real-World", "QC", "FAQ"],
+      sections: [
+         {
+            id: "shift",
+            title: "The Shift: From Broadcast to Narrowcast",
+            content: (
+               <>
+                  <p>In 2025, we have moved to a \"Narrowcast\" model. The goal is not to make one video that goes viral; it is to make 10,000 videos that each get 1 view, but that 1 view converts.</p>
+                  <div className="bg-alt/10 p-6 rounded-sm border border-ink/5 mt-6">
+                     <h4 className="font-bold text-ink mb-2">The \"Video Bottleneck\"</h4>
+                     <p className="text-sm text-ink-muted">Sales teams know video works. But a sales rep can only record ~10 personalized Loom videos a day before burning out.</p>
+                     <ul className="list-disc list-inside mt-2 text-sm text-ink-muted font-mono">
+                        <li>Manual Limit: 10 videos/day.</li>
+                        <li>Automated Limit: Infinite videos/day.</li>
+                     </ul>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "tech-stack",
+            title: "The Tech Stack: Veo, TTS, and Remotion",
+            content: (
+               <>
+                  <p>To build this pipeline, you need three distinct engines working in harmony.</p>
+                  <div className="space-y-6 mt-6">
+                     <div className="flex gap-4">
+                        <div className="w-8 h-8 rounded-full bg-ink text-white flex items-center justify-center font-bold flex-shrink-0">1</div>
+                        <div>
+                           <h4 className="font-bold text-ink">The Visual Engine (Google Veo)</h4>
+                           <p className="text-sm text-ink-muted">Generates the "Stock Footage." In 2025, Veo leads in "Prompt adherence" and text rendering.</p>
+                        </div>
+                     </div>
+                     <div className="flex gap-4">
+                        <div className="w-8 h-8 rounded-full bg-ink text-white flex items-center justify-center font-bold flex-shrink-0">2</div>
+                        <div>
+                           <h4 className="font-bold text-ink">The Audio Engine (ElevenLabs)</h4>
+                           <p className="text-sm text-ink-muted">Converts script to speech. "Speech-to-Speech" allows recording a rough draft with emotion that the AI polishes.</p>
+                        </div>
+                     </div>
+                     <div className="flex gap-4">
+                        <div className="w-8 h-8 rounded-full bg-ink text-white flex items-center justify-center font-bold flex-shrink-0">3</div>
+                        <div>
+                           <h4 className="font-bold text-ink">The Compositor (Remotion)</h4>
+                           <p className="text-sm text-ink-muted">The "Editor" that glues it together using React code.</p>
+                           <div className="mt-2 bg-ink text-white p-3 rounded text-xs font-mono">
+                              &lt;Sequence from={'{'}0{'}'} durationInFrames={'{'}90{'}'}&gt;<br />
+                              &nbsp;&nbsp;&lt;Title text={`{`}`Hello, ${'{'}customerName{'}'}!`{`}`} /&gt;<br />
+                              &nbsp;&nbsp;&lt;BackgroundVideo src={'{'}veoGeneratedAsset{'}'} /&gt;<br />
+                              &lt;/Sequence&gt;
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </>
+            )
+         },
+         {
+            id: "architecture",
+            title: "Architecture: Building the Video Factory",
+            content: (
+               <>
+                  <p>You are not editing; you are rendering. Here is the pipeline architecture.</p>
+                  <ul className="list-none space-y-4 mt-4">
+                     <li className="p-3 bg-white/50 border-l-2 border-ink/20">
+                        <strong className="block text-ink text-sm">Phase 1: Data Enrichment</strong>
+                        <span className="text-xs text-ink-muted">Agent visits techflow.io and takes a scrolling screenshot (Puppeteer). Extracts Name ("Sarah") and Industry ("Fintech").</span>
+                     </li>
+                     <li className="p-3 bg-white/50 border-l-2 border-ink/20">
+                        <strong className="block text-ink text-sm">Phase 2: Script Generation</strong>
+                        <span className="text-xs text-ink-muted">LLM writes a 45-second script based on industry context.</span>
+                     </li>
+                     <li className="p-3 bg-white/50 border-l-2 border-ink/20">
+                        <strong className="block text-ink text-sm">Phase 3: Asset Generation</strong>
+                        <span className="text-xs text-ink-muted">Audio via ElevenLabs. Background via Google Veo ("Generate modern digital banking interface").</span>
+                     </li>
+                     <li className="p-3 bg-white/50 border-l-2 border-accent">
+                        <strong className="block text-ink text-sm">Phase 4: Assembly & Rendering</strong>
+                        <span className="text-xs text-ink-muted">Remotion layers Avatar over background and overlays the website screenshot on a 3D laptop model.</span>
+                     </li>
+                  </ul>
+               </>
+            )
+         },
+         {
+            id: "real-world",
+            title: "Real-World Play: The Dynamic VSL",
+            content: (
+               <>
+                  <p><strong>Scenario:</strong> Selling Cybersecurity software to CTOs.</p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                     <div className="p-4 border border-ink/10 rounded-sm text-center">
+                        <h5 className="font-bold text-ink text-sm mb-2">The Hook (0-10s)</h5>
+                        <p className="text-xs text-ink-muted">Avatar stands in front of a generated server room. <br />"Hi James. I noticed [Company] scaled AWS usage..."</p>
+                     </div>
+                     <div className="p-4 border border-ink/10 rounded-sm text-center bg-accent/5">
+                        <h5 className="font-bold text-ink text-sm mb-2">The Proof (10-30s)</h5>
+                        <p className="text-xs text-ink-muted">Camera zooms into laptop screen showing James's ACTUAL website with a red "Security Alert" overlay.</p>
+                     </div>
+                     <div className="p-4 border border-ink/10 rounded-sm text-center">
+                        <h5 className="font-bold text-ink text-sm mb-2">The Close (30-45s)</h5>
+                        <p className="text-xs text-ink-muted">Avatar returns. <br />"I made a full report. Click below."</p>
+                     </div>
+                  </div>
+                  <p className="mt-4 text-center text-sm italic font-bold text-ink">Result: This is not viewed as "Marketing"; it is viewed as "Consulting."</p>
+               </>
+            )
+         },
+         {
+            id: "qc",
+            title: "Quality Control & The Uncanny Valley",
+            content: (
+               <div className="space-y-6 mt-4">
+                  <div>
+                     <h4 className="font-bold text-ink text-sm mb-1">The Lip-Sync Problem</h4>
+                     <p className="text-sm text-ink-muted">If audio and lips are out of sync, trust is destroyed. <strong>Solution:</strong> Use SyncLabs for "Universal Lip Sync" to modify video footage to match new audio tracks invisibly.</p>
+                  </div>
+                  <div>
+                     <h4 className="font-bold text-ink text-sm mb-1">The "Hallucination" Problem</h4>
+                     <p className="text-sm text-ink-muted">Veo might generate gibberish text in the background. <strong>Solution:</strong> Use "Negative Prompting" (negative_prompt: "text, watermark, blurry"). Overlay text using code instead.</p>
+                  </div>
+               </div>
+            )
+         }
+      ],
+      faqs: [
+         { question: "Is this expensive?", answer: "Compared to human editing, no. Roughly $0.80 per personalized video. If it doubles book rate, ROI is massive." },
+         { question: "How do I prevent the AI from saying something offensive?", answer: "Implement a Moderation Layer. Pass script through a 'Safety LLM' before sending to TTS." },
+         { question: "Can I clone my own voice and face?", answer: "Yes. This is best practice. Record your CEO (with consent) and train a custom Instant Avatar. It feels authentic." },
+         { question: "Does Veo generate sound?", answer: "Veo generates video. For sales assets, use clean, controlled TTS (Voiceover) rather than AI-generated ambient noise." }
       ]
    }
 };

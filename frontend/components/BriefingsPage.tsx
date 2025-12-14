@@ -10,6 +10,16 @@ import SyntheticDataImage from '../images/002 - Synthetic Data Pipelines.jpg';
 import ZeroTouchCRMImage from '../images/003 - Zero-Touch CRM.jpg';
 import RagVsContextImage from '../images/004 - RAG vs. Long Context.jpg';
 
+import LocalLLMImage from '../images/005 - Local LLM Stack 2025.jpg';
+
+import PromptPatternsImage from '../images/006 - Prompt Engineering Patterns.jpg';
+
+import ComplianceImage from '../images/007 - AI Legal Compliance.jpg';
+
+import SaaSPricingImage from '../images/008 - The Death of SaaS Pricing.jpg';
+
+import AutomatedVideoImage from '../images/009 - Automated Video Prod.jpg';
+
 interface BriefingsPageProps {
   onNavigate: (page: Page, hash?: string, id?: string) => void;
 }
@@ -55,7 +65,7 @@ export const allBriefings = [
     id: "local-llm-stack",
     title: "Local LLM Stack 2025",
     description: "Running Llama 4 locally for privacy-focused legal analysis. Hardware specs and inference engines reviewed.",
-    image: "https://images.unsplash.com/photo-1591453089816-0fbb971b454c?auto=format&fit=crop&q=80&w=800",
+    image: LocalLLMImage,
     issueNo: "040",
     category: "Architecture",
     featured: false,
@@ -64,7 +74,7 @@ export const allBriefings = [
     id: "prompt-patterns",
     title: "Prompt Engineering Patterns",
     description: "Moving beyond 'Chain of Thought'. Implementing 'Tree of Thoughts' and recursive criticism for complex reasoning tasks.",
-    image: "https://images.unsplash.com/photo-1614728263952-84ea256f9679?auto=format&fit=crop&q=80&w=800",
+    image: PromptPatternsImage,
     issueNo: "039",
     category: "Strategy",
     featured: false,
@@ -73,7 +83,7 @@ export const allBriefings = [
     id: "ai-compliance",
     title: "AI Legal Compliance",
     description: "Navigating the EU AI Act while shipping fast. Practical checklists for automated decision-making systems.",
-    image: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=800",
+    image: ComplianceImage,
     issueNo: "038",
     category: "Strategy",
     featured: false,
@@ -82,20 +92,21 @@ export const allBriefings = [
     id: "saas-pricing",
     title: "The Death of SaaS Pricing",
     description: "Why 'per seat' pricing is dying and how to transition your AI product to 'outcome-based' billing models.",
-    image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=800",
+    image: SaaSPricingImage,
     issueNo: "037",
     category: "Strategy",
     featured: false,
   },
   {
-    id: "video-prod",
+    id: "automated-video",
     title: "Automated Video Prod",
-    description: "Using Veo and text-to-speech pipelines to generate personalized sales assets at scale.",
-    image: "https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&q=80&w=800",
+    description: "The age of hyper-personalization. Using Veo and Remotion to create 'segments of one' for sales outreach.",
+    image: AutomatedVideoImage,
     issueNo: "036",
-    category: "Operations",
+    category: "Strategy",
     featured: false,
-  }
+  },
+
 ];
 
 const categories = ["All", "Architecture", "Engineering", "Operations", "Strategy"];
