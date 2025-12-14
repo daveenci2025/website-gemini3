@@ -12,6 +12,7 @@ const Booking: React.FC = () => {
    const [selectedTime, setSelectedTime] = useState<string | null>(null); // Stores ISO string
    const [step, setStep] = useState<'datetime' | 'details' | 'success'>('datetime');
    const [busySlots, setBusySlots] = useState<{ start: string, end: string }[]>([]);
+   const [isLoading, setIsLoading] = useState(true);
 
    const [formData, setFormData] = useState({
       name: '',
@@ -75,6 +76,7 @@ const Booking: React.FC = () => {
    // --- Availability Logic ---
 
    const fetchAvailability = async () => {
+      setIsLoading(true);
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
       const start = new Date(year, month, 1 - 7).toISOString();
@@ -91,6 +93,8 @@ const Booking: React.FC = () => {
          }
       } catch (error) {
          console.error('Failed to fetch availability', error);
+      } finally {
+         setIsLoading(false);
       }
    };
 
@@ -400,36 +404,42 @@ const Booking: React.FC = () => {
                                  </h3>
 
                                  {selectedDate ? (
-                                    <>
-                                       <div className="grid grid-cols-3 gap-3 mb-6">
-                                          {displaySlots.map(slot => {
-                                             const disabled = isTimeDisabled(slot.value);
-                                             return (
-                                                <button
-                                                   key={slot.value}
-                                                   disabled={disabled}
-                                                   onClick={() => !disabled && setSelectedTime(slot.value)}
-                                                   className={`py-3 px-2 text-sm border rounded-sm transition-all text-center ${selectedTime === slot.value
-                                                      ? 'bg-accent text-white border-accent shadow-md scale-105'
-                                                      : disabled
-                                                         ? 'bg-base/50 text-ink-muted/30 border-ink/5 cursor-not-allowed'
-                                                         : 'bg-white border-ink/10 text-ink hover:border-accent hover:text-accent hover:shadow-sm'
-                                                      }`}
-                                                >
-                                                   {slot.display}
-                                                </button>
-                                             );
-                                          })}
+                                    isLoading ? (
+                                       <div className="flex flex-col items-center justify-center py-12 text-ink-muted/50">
+                                          <div className="w-6 h-6 border-2 border-accent/30 border-t-accent rounded-full animate-spin mb-3"></div>
+                                          <span className="text-sm font-medium">Checking availability...</span>
                                        </div>
-                                       <Button
-                                          variant="primary"
-                                          className={`w-full ${!selectedTime ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                          onClick={() => selectedTime && setStep('details')}
-                                       >
-                                          Next
-                                       </Button>
-                                    </>
-                                 ) : (
+                                    ) : (
+                                       <>
+                                          <div className="grid grid-cols-3 gap-3 mb-6">
+                                             {displaySlots.map(slot => {
+                                                const disabled = isTimeDisabled(slot.value);
+                                                return (
+                                                   <button
+                                                      key={slot.value}
+                                                      disabled={disabled}
+                                                      onClick={() => !disabled && setSelectedTime(slot.value)}
+                                                      className={`py-3 px-2 text-sm border rounded-sm transition-all text-center ${selectedTime === slot.value
+                                                         ? 'bg-accent text-white border-accent shadow-md scale-105'
+                                                         : disabled
+                                                            ? 'bg-base/50 text-ink-muted/30 border-ink/5 cursor-not-allowed'
+                                                            : 'bg-white border-ink/10 text-ink hover:border-accent hover:text-accent hover:shadow-sm'
+                                                         }`}
+                                                   >
+                                                      {slot.display}
+                                                   </button>
+                                                );
+                                             })}
+                                          </div>
+                                          <Button
+                                             variant="primary"
+                                             className={`w-full ${!selectedTime ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                             onClick={() => selectedTime && setStep('details')}
+                                          >
+                                             Next
+                                          </Button>
+                                       </>
+                                    )) : (
                                     <div className="text-center text-ink-muted/50 text-sm italic py-4">
                                        Available times will appear here
                                     </div>
