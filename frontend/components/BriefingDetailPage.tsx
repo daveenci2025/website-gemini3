@@ -40,6 +40,7 @@ interface BriefingData {
    toc: string[];
    sections: BriefingSection[];
    faqs: { question: string; answer: string }[];
+   furtherResources?: { title: string; url: string; type?: string }[];
 }
 
 // Briefing Data Dictionary
@@ -255,6 +256,11 @@ const briefings: Record<string, BriefingData> = {
          { question: "Which model is best for agentic workflows?", answer: "Currently, Claude 3.5 Sonnet and GPT-4o are the leaders for coding and agentic reasoning due to their ability to follow complex instructions and adhere to tool schemas. For local deployment, Llama 3.1 (70B) is the top open-source contender." },
          { question: "How do I debug an agent?", answer: "Debugging agents is difficult because they are non-deterministic. You must implement 'Observability' using tools like LangSmith or Arize Phoenix. These tools trace the execution path, showing you the exact 'Thought' and 'Observation' at every step of the loop." },
          { question: "Are agents ready for production?", answer: "Yes, but with 'Human-in-the-loop' guardrails. Autonomous agents are widely used for data analysis, coding assistance, and internal research. Customer-facing agents usually require a final approval step before sending messages." }
+      ],
+      furtherResources: [
+         { title: "Andrew Ng: Why Agents are the Future", url: "https://www.deeplearning.ai/the-batch/issue-242/" },
+         { title: "Sequoia: Generative AI’s Act Two", url: "https://www.sequoiacap.com/article/generative-ai-act-two/" },
+         { title: "Video: The Shift from Chatbots to Agentic Workflows", url: "https://www.youtube.com/watch?v=sal78ACtGTc" }
       ]
    },
    "synthetic-data": {
@@ -434,6 +440,11 @@ const briefings: Record<string, BriefingData> = {
          { question: "Does synthetic data hallucinate?", answer: "Yes. The generator can invent facts. This is why the Validation/Filtering step in the pipeline is mandatory. You must programmatically verify the data before training on it." },
          { question: "Can I copyright a model trained on synthetic data?", answer: "This is a gray area in 2025. While you cannot copyright the synthetic data itself, the weights of the model you train may be proprietary depending on your jurisdiction." },
          { question: "How much synthetic data do I need?", answer: "For fine-tuning a specific behavior (e.g., 'Speak like a pirate'), you may only need 500–1,000 synthetic examples. For teaching a model a new skill, you need tens of thousands." }
+      ],
+      furtherResources: [
+         { title: "Microsoft: Textbooks Are All You Need", url: "https://arxiv.org/abs/2306.11644" },
+         { title: "Hugging Face: Cosmopedia Dataset", url: "https://huggingface.co/blog/cosmopedia" },
+         { title: "Gretel.ai: The Synthetic Data Playbook", url: "https://gretel.ai/synthetic-data" }
       ]
    },
    "zero-touch-crm": {
@@ -620,6 +631,10 @@ const briefings: Record<string, BriefingData> = {
          { question: "Does this work with legacy CRMs like Salesforce?", answer: "Yes. While newer CRMs (Attio, folk) have this native, you can build Zero-Touch pipelines on top of Salesforce using their API or middleware tools like Zapier/Make combined with OpenAI." },
          { question: "How do you handle 'Hallucinations' in data entry?", answer: "You implement 'Confidence Scores.' If the AI is 99% sure it found a phone number, it updates the field. If it is only 60% sure, it creates a 'Task' for a human to verify the data." },
          { question: "Is it legal to scrape LinkedIn for this?", answer: "Direct scraping is against LinkedIn ToS. However, using authorized data vendors (like PeopleDataLabs or Clearbit) who aggregate public data is the standard, compliant workaround." }
+      ],
+      furtherResources: [
+         { title: "Clay.com: The Self-Healing Data Platform", url: "https://www.clay.com/" },
+         { title: "Census: The Modern Data Stack for Sales", url: "https://www.getcensus.com/blog/what-is-reverse-etl" }
       ]
    },
    "rag-vs-long-context": {
@@ -1305,6 +1320,7 @@ const briefings: Record<string, BriefingData> = {
          { question: "How do I start?", answer: "Perform a Fundamental Rights Impact Assessment (FRIA). It asks: 'Could this AI hurt someone's safety or rights?' If yes, call legal." }
       ]
    },
+
    "saas-pricing": {
       id: "saas-pricing",
       title: "The Death of SaaS Pricing: From \"Seats\" to \"Outcomes\"",
@@ -1739,14 +1755,21 @@ const BriefingDetailPage: React.FC<BriefingDetailPageProps> = ({ onNavigate, id 
                </div>
 
                {/* Further Reading */}
-               <div id="further-reading" className="bg-ink text-base p-8 rounded-sm">
-                  <h3 className="font-serif text-xl text-white mb-4">Further Resources</h3>
-                  <ul className="space-y-2 text-white/70">
-                     <li className="hover:text-accent cursor-pointer transition-colors">→ Read: The ReAct Paper (Reasoning + Acting)</li>
-                     <li className="hover:text-accent cursor-pointer transition-colors">→ GitHub: LangChain Agent Templates</li>
-                     <li className="hover:text-accent cursor-pointer transition-colors">→ DaVeenci Codex: Prompt Patterns (Briefing #039)</li>
-                  </ul>
-               </div>
+               {data.furtherResources && data.furtherResources.length > 0 && (
+                  <div id="further-reading" className="bg-ink text-base p-8 rounded-sm">
+                     <h3 className="font-serif text-xl text-white mb-4">Further Resources</h3>
+                     <ul className="space-y-2 text-white/70">
+                        {data.furtherResources.map((resource, i) => (
+                           <li key={i} className="hover:text-accent cursor-pointer transition-colors">
+                              <a href={resource.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group/link">
+                                 <span className="opacity-50 group-hover/link:opacity-100 transition-opacity">→</span>
+                                 <span className="border-b border-transparent group-hover/link:border-accent transition-colors">{resource.title}</span>
+                              </a>
+                           </li>
+                        ))}
+                     </ul>
+                  </div>
+               )}
 
             </article>
          </div>
